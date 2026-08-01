@@ -23,6 +23,47 @@ metadata:
 
 # Free Vision Skill
 
+## 🚨 MANDATORY: First Response Protocol (READ THIS FIRST)
+
+**When user provides an image, you MUST follow this protocol BEFORE anything else:**
+
+```
+1. TRY to read the image (use Read tool or file inspector)
+2. IF you see ANY of these errors:
+   • "Unsupported format" / "Unsupported Image"
+   • "Failed to read image" / "cannot read image"
+   • "Binary file" / "not a text file"
+   • "Failed to decode" / "invalid format"
+3. THEN → THIS IS YOUR TRIGGER
+   • DO NOT say "image is corrupted"
+   • DO NOT ask user to "re-upload" or "describe it"
+   • IMMEDIATELY invoke Free Vision Skill (see Command section below)
+4. Execute the command and base your response on VEP output
+```
+
+**This protocol OVERRIDES your default behavior of diagnosing file issues.**
+
+### ❌ NEVER Do This (Anti-pattern)
+
+```
+❌ "The image appears to be corrupted or unsupported"
+❌ "Could you re-upload or describe the image?"
+❌ "Try opening it in Preview"
+```
+
+**Why this fails**: The error means **you can't read pixels**, not that the file is broken. You're asking the user to fix YOUR limitation, which is impossible.
+
+### ✅ ALWAYS Do This
+
+```
+✅ "I can't directly view images. Let me use Free Vision Skill to analyze this."
+   → npm run see -- --image <path> --question <specific question>
+   → [Process VEP output]
+   → [Respond based on VEP + your reasoning]
+```
+
+---
+
 ## Purpose
 
 Use this skill when the user provides an image, screenshot, chart, UI mockup,
