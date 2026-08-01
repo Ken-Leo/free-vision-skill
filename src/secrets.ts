@@ -115,9 +115,22 @@ export async function storeProviderKey(
     return;
   }
 
+  if (process.platform === "win32") {
+    // Windows Credential Manager via cmdkey
+    await run("cmdkey", [
+      "/generic:",
+      serviceName(providerId),
+      "/user:",
+      accountName(),
+      "/pass:",
+      apiKey
+    ]);
+    return;
+  }
+
   throw new Error(
-    "OS Keychain login currently supports macOS Keychain and Linux Secret Service. " +
-    "On Windows, use a process environment variable or .env outside the repository."
+    `OS Keychain login currently supports macOS Keychain, Linux Secret Service, and Windows Credential Manager. ` +
+    `Unsupported platform: ${process.platform}`
   );
 }
 
@@ -145,6 +158,26 @@ export async function loadProviderKey(
         "provider", providerId
       ]);
     }
+
+    if (process.platform === "win32") {
+      // Windows: use cmdkey to list and find credential
+      const output = await run("cmdkey", ["/list"]);
+      const target = serviceName(providerId);
+
+      // Parse cmdkey output to find matching credential
+      const lines = output.split("\n");
+      for (let i = 0; i < lines.length; i++) {
+        if (lines[i]?.includes(target)) {
+          // Found target, password is on next line after "Password:"
+          for (let j = i; j < Math.min(i + 10, lines.length); j++) {
+            if (lines[j]?.includes("Password:")) {
+              return lines[j]?.split("Password:")[1]?.trim();
+            }
+          }
+        }
+      }
+      return undefined;
+    }
   } catch {
     return undefined;
   }
@@ -171,5 +204,11 @@ export async function deleteProviderKey(providerId: string): Promise<void> {
     return;
   }
 
-  throw new Error("Keychain logout is not supported on this platform.");
+  if (process.platform === "win32") {
+    // Windows: delete credential by target
+    await run("cmdkey", ["/delete:", serviceName(providerId)]);
+    return;
+  }
+
+  throw new Error(`Keychain logout is not supported on this platform: ${process.platform}`);
 }

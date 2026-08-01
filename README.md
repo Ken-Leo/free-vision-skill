@@ -150,6 +150,9 @@ free-vision login zhipu
 
 # Linux
 free-vision login zhipu
+
+# Windows
+free-vision login zhipu
 ```
 
 ### 使用
@@ -262,6 +265,22 @@ VEP/1|src=zhipu/glm-4.6v-flash|m=chart|
 a="月度营收增长"|
 v=[45200,58300,72100]|
 c=0.96
+```
+
+### 5️⃣ 自动裁剪
+
+```bash
+free-vision see --image ./screenshot.png --auto-crop \
+  --question "只提取错误信息"
+```
+
+自动检测并裁剪图片的白色/透明边距，减少 50-90% 的图片大小，降低 token 消耗。
+
+**示例：**
+```
+✂️  Cropped: 400x300 → 369x58
+   Reduction: 82%
+   Saved to: ./screenshot.cropped.png
 ```
 
 ---
