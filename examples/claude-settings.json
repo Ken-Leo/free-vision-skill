@@ -1,0 +1,39 @@
+{
+  // Claude Code 配置示例 — Free Vision Skill 集成
+  //
+  // 安装位置：~/.claude/settings.json
+  // 或项目级别：.claude/settings.json
+
+  "hooks": {
+    // 当用户上传图片时自动触发
+    "on-image-upload": {
+      "command": "${CLAUDE_PROJECT_DIR}/node_modules/free-vision-skill/hooks/claude-code/detect-image.sh",
+      "description": "自动分析用户上传的图片并返回 VEP",
+      "timeout": 30000,
+      "env": {
+        "VISION_PROVIDER": "auto",
+        "VISION_REGION": "cn"
+      }
+    }
+  },
+
+  // 或者使用 Claude Code 的 skill 系统
+  "skills": {
+    "free-vision": {
+      "enabled": true,
+      "auto-detect-images": true,
+      "default-provider": "auto",
+      "default-region": "cn",
+      "max-vep-length": 520,
+      "cache-enabled": true
+    }
+  },
+
+  // 环境变量配置（可选）
+  "env": {
+    "VISION_PROVIDER": "auto",
+    "VISION_REGION": "cn",
+    "ZHIPU_API_KEY": "${ZHIPU_API_KEY}",
+    "MODELSCOPE_API_KEY": "${MODELSCOPE_API_KEY}"
+  }
+}
