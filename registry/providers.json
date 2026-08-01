@@ -1,0 +1,223 @@
+{
+  "version": 1,
+  "verifiedAt": "2026-08-01",
+  "providers": [
+    {
+      "id": "zhipu",
+      "name": "Zhipu BigModel",
+      "region": "cn",
+      "kind": "openai",
+      "baseUrl": "https://open.bigmodel.cn/api/paas/v4",
+      "apiKeyEnv": "ZHIPU_API_KEY",
+      "models": [
+        "glm-4.6v-flash",
+        "glm-4v-flash"
+      ],
+      "defaultModel": "glm-4.6v-flash",
+      "free": "permanent-free models",
+      "supportsDetail": false,
+      "priority": 10,
+      "notes": "Best default in mainland China. GLM-4.6V-Flash and GLM-4V-Flash are documented free visual models."
+    },
+    {
+      "id": "modelscope",
+      "name": "ModelScope API-Inference",
+      "region": "cn",
+      "kind": "openai",
+      "baseUrl": "https://api-inference.modelscope.cn/v1",
+      "apiKeyEnv": "MODELSCOPE_API_KEY",
+      "models": [
+        "Qwen/Qwen3-VL-8B-Instruct",
+        "Qwen/Qwen3-VL-8B-Thinking"
+      ],
+      "defaultModel": "Qwen/Qwen3-VL-8B-Instruct",
+      "free": "selected models / quota varies",
+      "supportsDetail": false,
+      "priority": 20,
+      "authPrefix": "",
+      "notes": "ModelScope requires token without 'Bearer' prefix in Authorization header. Token format: ms-xxxxx. Verify the model page shows ModelScope Inference before use."
+    },
+    {
+      "id": "siliconflow",
+      "name": "SiliconFlow",
+      "region": "cn",
+      "kind": "openai",
+      "baseUrl": "https://api.siliconflow.cn/v1",
+      "apiKeyEnv": "SILICONFLOW_API_KEY",
+      "models": [],
+      "defaultModel": "",
+      "modelEnv": "SILICONFLOW_VISION_MODEL",
+      "free": "free catalog changes frequently",
+      "supportsDetail": true,
+      "priority": 30,
+      "notes": "No hard-coded model: several older VL model IDs were retired in 2026. Set SILICONFLOW_VISION_MODEL from the live model catalog."
+    },
+    {
+      "id": "alibaba",
+      "name": "Alibaba Cloud Model Studio",
+      "region": "cn",
+      "kind": "openai",
+      "baseUrl": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+      "baseUrlEnv": "ALIBABA_BASE_URL",
+      "apiKeyEnv": "DASHSCOPE_API_KEY",
+      "models": [
+        "qwen3-vl-flash"
+      ],
+      "defaultModel": "qwen3-vl-flash",
+      "free": "new-user quota, China Beijing, 90 days",
+      "supportsDetail": false,
+      "priority": 40,
+      "notes": "Trial rather than permanent free. Workspace-specific Beijing URL may be required for current Qwen-VL deployments."
+    },
+    {
+      "id": "openrouter",
+      "name": "OpenRouter",
+      "region": "global",
+      "kind": "openai",
+      "baseUrl": "https://openrouter.ai/api/v1",
+      "apiKeyEnv": "OPENROUTER_API_KEY",
+      "models": [
+        "nvidia/nemotron-nano-12b-v2-vl:free",
+        "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+        "openrouter/free"
+      ],
+      "defaultModel": "nvidia/nemotron-nano-12b-v2-vl:free",
+      "free": "permanent free variants; shared daily limits",
+      "supportsDetail": true,
+      "priority": 10,
+      "notes": "Use an explicit :free model for predictable behavior. openrouter/free can auto-select an image-capable free model."
+    },
+    {
+      "id": "groq",
+      "name": "GroqCloud",
+      "region": "global",
+      "kind": "openai",
+      "baseUrl": "https://api.groq.com/openai/v1",
+      "apiKeyEnv": "GROQ_API_KEY",
+      "models": [
+        "qwen/qwen3.6-27b"
+      ],
+      "defaultModel": "qwen/qwen3.6-27b",
+      "free": "free plan with model-specific RPM/RPD/TPD",
+      "supportsDetail": false,
+      "priority": 20,
+      "notes": "Fast vision route. Official free-plan limits currently include Qwen3.6-27B."
+    },
+    {
+      "id": "nvidia",
+      "name": "NVIDIA NIM",
+      "region": "global",
+      "kind": "openai",
+      "baseUrl": "https://integrate.api.nvidia.com/v1",
+      "apiKeyEnv": "NVIDIA_API_KEY",
+      "models": [
+        "nvidia/nemotron-nano-12b-v2-vl"
+      ],
+      "defaultModel": "nvidia/nemotron-nano-12b-v2-vl",
+      "free": "free prototype endpoint",
+      "supportsDetail": false,
+      "priority": 30,
+      "notes": "Phone verification may be required. Prototype endpoints are for building and evaluation."
+    },
+    {
+      "id": "gemini",
+      "name": "Google Gemini API",
+      "region": "global",
+      "kind": "openai",
+      "baseUrl": "https://generativelanguage.googleapis.com/v1beta/openai",
+      "apiKeyEnv": "GEMINI_API_KEY",
+      "models": [
+        "gemini-3.5-flash-lite",
+        "gemini-3.5-flash"
+      ],
+      "defaultModel": "gemini-3.5-flash-lite",
+      "free": "free tier in supported countries",
+      "supportsDetail": true,
+      "priority": 40,
+      "notes": "No official mainland-China mirror. Free tier is unavailable in some countries."
+    },
+    {
+      "id": "mistral",
+      "name": "Mistral AI",
+      "region": "global",
+      "kind": "openai",
+      "baseUrl": "https://api.mistral.ai/v1",
+      "apiKeyEnv": "MISTRAL_API_KEY",
+      "models": [
+        "mistral-small-latest"
+      ],
+      "defaultModel": "mistral-small-latest",
+      "free": "Studio Free mode; data-training opt-in/terms apply",
+      "supportsDetail": false,
+      "priority": 50,
+      "notes": "Mistral Small supports image understanding. Check live account limits."
+    },
+    {
+      "id": "cohere",
+      "name": "Cohere",
+      "region": "global",
+      "kind": "cohere",
+      "baseUrl": "https://api.cohere.ai/v2",
+      "apiKeyEnv": "COHERE_API_KEY",
+      "models": [
+        "command-a-vision-07-2025",
+        "c4ai-aya-vision-32b"
+      ],
+      "defaultModel": "command-a-vision-07-2025",
+      "free": "evaluation key: 1,000 calls/month, 20 RPM for Command A Vision",
+      "supportsDetail": true,
+      "priority": 60,
+      "notes": "Evaluation keys are free but limited and not intended as an unbounded production tier."
+    },
+    {
+      "id": "cloudflare",
+      "name": "Cloudflare Workers AI",
+      "region": "global",
+      "kind": "openai",
+      "baseUrl": "https://api.cloudflare.com/client/v4/accounts/{ACCOUNT_ID}/ai/v1",
+      "baseUrlEnv": "CLOUDFLARE_AI_BASE_URL",
+      "apiKeyEnv": "CLOUDFLARE_API_TOKEN",
+      "models": [
+        "@cf/meta/llama-3.2-11b-vision-instruct",
+        "@cf/mistralai/mistral-small-3.1-24b-instruct"
+      ],
+      "defaultModel": "@cf/meta/llama-3.2-11b-vision-instruct",
+      "free": "10,000 neurons/day",
+      "supportsDetail": false,
+      "priority": 70,
+      "notes": "Set CLOUDFLARE_AI_BASE_URL with your account ID."
+    },
+    {
+      "id": "ollama",
+      "name": "Ollama Cloud",
+      "region": "global",
+      "kind": "openai",
+      "baseUrl": "https://ollama.com/v1",
+      "apiKeyEnv": "OLLAMA_API_KEY",
+      "models": [
+        "qwen3-vl:235b-cloud"
+      ],
+      "defaultModel": "qwen3-vl:235b-cloud",
+      "free": "free plan, light cloud usage",
+      "supportsDetail": false,
+      "priority": 80,
+      "notes": "Cloud limits are compute-based and not a fixed token allowance. Local Ollama can be used at http://localhost:11434/v1."
+    },
+    {
+      "id": "sambanova",
+      "name": "SambaNova Cloud",
+      "region": "global",
+      "kind": "openai",
+      "baseUrl": "https://api.sambanova.ai/v1",
+      "apiKeyEnv": "SAMBANOVA_API_KEY",
+      "models": [
+        "Llama-4-Maverick-17B-128E-Instruct"
+      ],
+      "defaultModel": "Llama-4-Maverick-17B-128E-Instruct",
+      "free": "free tier with model-specific rate limits",
+      "supportsDetail": false,
+      "priority": 90,
+      "notes": "Uses OpenAI multimodal input format."
+    }
+  ]
+}

@@ -1,0 +1,63 @@
+{
+  "name": "free-vision-skill",
+  "version": "0.1.0",
+  "description": "A low-token visual evidence compiler for text-only coding agents.",
+  "type": "module",
+  "license": "MIT",
+  "author": "lora-sys",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lora-sys/free-vision-skill.git"
+  },
+  "homepage": "https://github.com/lora-sys/free-vision-skill#readme",
+  "bugs": {
+    "url": "https://github.com/lora-sys/free-vision-skill/issues"
+  },
+  "keywords": [
+    "agent-skill",
+    "deepseek",
+    "vision",
+    "coding-agent",
+    "vlm",
+    "ocr",
+    "visual-evidence",
+    "low-token",
+    "codex",
+    "claude-code",
+    "opencode"
+  ],
+  "files": [
+    "dist",
+    "registry",
+    "SKILL.md",
+    "README.md",
+    "LICENSE"
+  ],
+  "bin": {
+    "free-vision": "./dist/src/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx src/cli.ts",
+    "see": "tsx src/cli.ts see",
+    "doctor": "tsx src/cli.ts doctor",
+    "providers": "tsx src/cli.ts providers",
+    "login": "tsx src/cli.ts login",
+    "logout": "tsx src/cli.ts logout",
+    "test": "tsx --test tests/*.test.ts",
+    "typecheck": "tsc --noEmit",
+    "check": "npm run typecheck && npm test",
+    "prepublishOnly": "npm run check && npm run build"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
