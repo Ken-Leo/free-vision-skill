@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "skills": {
+    "free-vision": {
+      "source": "/Users/lora/repos/free-vision-skill",
+      "sourceType": "local",
+      "computedHash": "855cfaf4193096e3379d9466c4558d842a973881f8515f6a29cd5faa78ff08bc"
+    }
+  }
+}

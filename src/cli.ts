@@ -25,6 +25,12 @@ import {
   readSecret,
   storeProviderKey
 } from "./secrets.js";
+import {
+  checkAllProvidersHealth,
+  formatLatency,
+  getStatusIcon,
+  type HealthStatus
+} from "./health.js";
 
 function parseArgs(argv: string[]): CliArgs {
   const result: CliArgs = {};
@@ -183,13 +189,79 @@ async function providers(): Promise<void> {
 
 async function doctor(): Promise<void> {
   console.log("Free Vision Skill doctor\n");
-  await providers();
-  console.log("\nChecks:");
-  console.log("- ✓ Provider registry loaded");
-  console.log("- ✓ Local VEP compression available");
-  console.log("- ✓ SHA-256 result cache available");
-  console.log("- Keychain: macOS Keychain or Linux Secret Service");
-  console.log("- Run a focused `see` request to validate real quota and model availability.");
+
+  // 获取所有 provider
+  const providers = allProviders();
+
+  console.log("Provider Health Check:\n");
+
+  // 执行健康检查
+  const healthStatuses = await checkAllProvidersHealth(providers);
+
+  // 显示结果
+  for (const status of healthStatuses) {
+    const icon = getStatusIcon(status.status);
+    const regionLabel = status.region === "cn" ? "cn" : "gl";
+    const latency = formatLatency(status.latencyMs);
+    const quotaLabel = status.quotaRemaining
+      ? `[${status.quotaRemaining}]`
+      : "";
+
+    console.log(
+      `${icon} ${status.provider.padEnd(12)} ${regionLabel.padEnd(3)} ${status.model.padEnd(
+        35
+      )} ${latency.padStart(6)} ${quotaLabel}`
+    );
+
+    if (status.error && status.status !== "healthy") {
+      console.log(`    └─ ${status.error}`);
+    }
+  }
+
+  // 统计
+  const summary = {
+    total: healthStatuses.length,
+    healthy: healthStatuses.filter(s => s.status === "healthy").length,
+    degraded: healthStatuses.filter(s => s.status === "degraded").length,
+    unhealthy: healthStatuses.filter(s => s.status === "unhealthy").length,
+    noKey: healthStatuses.filter(s => s.status === "no-key").length
+  };
+
+  console.log(`\nSummary: ${summary.healthy}/${summary.total} providers healthy`);
+
+  if (summary.degraded > 0) {
+    console.log(`  ⚠️  ${summary.degraded} degraded (rate-limited)`);
+  }
+  if (summary.unhealthy > 0) {
+    console.log(`  ❌ ${summary.unhealthy} unhealthy (connection/auth issue)`);
+  }
+  if (summary.noKey > 0) {
+    console.log(`  ⚪ ${summary.noKey} not configured (no API key)`);
+  }
+
+  // 系统检查
+  console.log("\nSystem Checks:");
+  console.log("  ✓ Provider registry loaded");
+  console.log("  ✓ Local VEP compression available");
+  console.log("  ✓ SHA-256 result cache available");
+  console.log("  ✓ Health check module loaded");
+  console.log("  - Keychain: macOS Keychain or Linux Secret Service");
+
+  // 健康提示
+  if (summary.healthy === 0) {
+    console.log("\n⚠️  No healthy providers found!");
+    console.log("Run: free-vision login <provider> to configure credentials.");
+  } else if (summary.healthy < summary.total / 2) {
+    console.log(
+      "\n💡 Less than half of providers are healthy. Consider configuring more."
+    );
+  }
+
+  if (summary.degraded > 0) {
+    console.log(
+      "\n💡 Some providers are rate-limited. Wait a few minutes or use a different provider."
+    );
+  }
 }
 
 async function login(providerId: string | undefined): Promise<void> {

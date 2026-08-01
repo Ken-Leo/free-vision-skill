@@ -76,26 +76,41 @@ detect_image() {
     echo "$image_path"
 }
 
-# 根据图片特征生成智能问题
+# 根据图片特征和文件名生成智能问题
 generate_smart_question() {
     local image_path="$1"
+    local filename=$(basename "$image_path")
+    local filename_lower=$(echo "$filename" | tr '[:upper:]' '[:lower:]')
 
-    # 如果是临时文件或未知来源，使用通用问题
-    if [ -z "$image_path" ]; then
-        echo "Describe what you see in one sentence"
+    # 如果无法获取图片路径，使用通用问题
+    if [ -z "$image_path" ] || [ ! -f "$image_path" ]; then
+        echo "Describe what you see briefly"
         return
     fi
 
-    # 获取图片信息
-    local file_info=$(file "$image_path" 2>/dev/null || echo "")
-
-    # TODO: 这里可以添加更智能的检测逻辑
-    # 例如：检测图片尺寸、颜色分布、文件名等
-    #
-    # 当前版本：使用通用问题
-    # 未来版本：可以根据 filename 关键词（error, ui, chart）推断类型
-
-    echo "Describe what you see briefly"
+    # 基于文件名关键词推断图片类型
+    if echo "$filename_lower" | grep -qE '(error|exception|traceback|报错|错误)'; then
+        # 错误截图模式
+        echo "Extract only the exact error message, filename, and line number. Ignore stack traces."
+    elif echo "$filename_lower" | grep -qE '(ui|screen|界面|截图|screenshot)'; then
+        # UI 截图模式
+        echo "List only disabled, clipped, overlapping, broken, or visually incorrect UI elements."
+    elif echo "$filename_lower" | grep -qE '(chart|graph|plot|图表|图形)'; then
+        # 图表模式
+        echo "Return only the chart title, main trend, and 3 key values."
+    elif echo "$filename_lower" | grep -qE '(table|grid|表格)'; then
+        # 表格模式
+        echo "Extract all text and table structure. Return as markdown table."
+    elif echo "$filename_lower" | grep -qE '(logo|icon|图标|logo)'; then
+        # Logo/图标模式
+        echo "Describe the logo or icon in one sentence."
+    elif echo "$filename_lower" | grep -qE '(code|snippet|代码)'; then
+        # 代码截图模式
+        echo "Extract only the code content and language. Ignore line numbers if unclear."
+    else
+        # 默认通用模式
+        echo "Describe what you see in one brief sentence. Focus on the most important visual evidence."
+    fi
 }
 
 # 调用 free-vision

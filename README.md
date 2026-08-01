@@ -8,7 +8,7 @@
   <img alt="Node 20+" src="https://img.shields.io/badge/node-%3E%3D20-22c55e">
   <img alt="VEP Protocol" src="https://img.shields.io/badge/output-VEP%2F1-38bdf8">
   <img alt="Text-only agents" src="https://img.shields.io/badge/for-text--only_agents-white">
-  <a href="https://github.com/lora-sys/free-vision-skill/releases/tag/v0.1.0"><img alt="Version" src="https://img.shields.io/badge/version-0.1.0-blue"></a>
+  <a href="https://github.com/lora-sys/free-vision-skill/releases/tag/v0.2.0"><img alt="Version" src="https://img.shields.io/badge/version-0.2.0-blue"></a>
 </p>
 
 ---
@@ -384,6 +384,279 @@ free-vision see --image error.png \
 free-vision see --image error.png \
   --question "详细分析错误并提供完整解决方案"
 ```
+
+---
+
+## 🤖 Agent 快速参考
+
+> 本节专门为 AI Agent 设计，提供快速理解和集成 Free Vision Skill 所需的核心信息。
+
+### 这是什么？
+
+Free Vision Skill 是一个视觉证据编译器，让没有视觉能力的文本模型能按需调用视觉 API：
+- 接收图片 + 问题 → 调用视觉 API → 返回压缩的 VEP（Visual Evidence Packet）
+- VEP 只包含**事实**，不包含完整描述
+- Token 消耗 50-220，比完整描述节省 80-90%
+
+### 核心工作流
+
+```
+图片 + 问题
+  ↓
+free-vision see --image <path> --question <问题>
+  ↓
+VEP/1|src=provider/model|m=mode|a=answer|t=text|e=errors|c=confidence
+  ↓
+主模型基于 VEP 继续推理
+```
+
+### Agent 集成步骤
+
+#### 1. 检测图片
+
+当用户上传图片时：
+- **Claude Code**: Hook 自动检测（`hooks/claude-code/detect-image.sh`）
+- **Codex/OpenCode**: 通过配置文件启用自动检测
+- **通用**: 检查环境变量 `CLAUDE_IMAGE_PATH` 或命令行参数
+
+#### 2. 生成问题
+
+根据图片类型选择问题：
+
+| 图片类型 | 问题模板 |
+|---------|---------|
+| 错误截图 | "只提取错误信息、文件名和行号" |
+| UI 截图 | "列出被裁切、重叠或禁用的元素" |
+| 图表 | "返回标题、趋势和三个关键值" |
+| 表格/OCR | "提取所有文本和表格结构" |
+| 通用 | "简要描述你看到的内容" |
+
+**智能识别**: 基于文件名关键词（error、ui、chart、table、logo、code）
+
+#### 3. 调用 free-vision
+
+```bash
+# 基础调用
+free-vision see --image ./screenshot.png --question "你的问题"
+
+# JSON 输出（用于解析）
+free-vision see --image ./screenshot.png --question "..." --json
+
+# 指定 Provider
+free-vision see --image ./screenshot.png --provider zhipu --region cn
+
+# 跳过缓存
+free-vision see --image ./screenshot.png --no-cache
+```
+
+#### 4. 解析 VEP
+
+VEP 格式：`VEP/1|key=value|key=value|...`
+
+```typescript
+// 解析示例
+VEP/1|src=zhipu/glm-4.6v-flash|m=error|
+a="Cannot find module ethers"|
+t="src/app.ts:42"|
+e=[dependency error]|
+c=0.97
+
+// 字段说明
+{
+  version: "VEP/1",
+  src: "zhipu/glm-4.6v-flash",  // Provider 和模型
+  m: "error",                     // 模式：error/ocr/ui/chart/general
+  a: "Cannot find module...",     // 直接答案
+  t: "src/app.ts:42",             // OCR 文本
+  e: ["dependency error"],        // 错误列表
+  c: 0.97                         // 置信度 (0-1)
+}
+```
+
+**可选字段**: `o`（对象）、`v`（值）、`s`（摘要）、`d`（描述）
+
+### Provider 选择
+
+#### 中国用户
+```bash
+# 推荐：智谱 AI（永久免费）
+export ZHIPU_API_KEY=your-key
+free-vision login zhipu
+
+# 备选：ModelScope、SiliconFlow、阿里
+```
+
+#### 全球用户
+```bash
+# 推荐：OpenRouter（永久免费层）
+export OPENROUTER_API_KEY=your-key
+free-vision login openrouter
+
+# 备选：Groq、Gemini、Mistral 等
+```
+
+#### Auto 模式（推荐）
+```bash
+export VISION_PROVIDER=auto
+export VISION_REGION=cn  # 或 global
+# 自动按优先级选择，失败时降级
+```
+
+### Agent 最佳实践
+
+#### ✅ 推荐做法
+
+1. **使用聚焦式问题**
+   ```bash
+   # ✅ 好：只提取错误信息
+   --question "只提取错误信息和行号"
+
+   # ❌ 避免：要求完整分析
+   --question "详细分析并提供完整解决方案"
+   ```
+
+2. **利用缓存**
+   ```bash
+   # 相同图片+问题自动命中缓存（SHA-256）
+   # 无需额外配置，默认启用
+   ```
+
+3. **处理降级**
+   ```bash
+   # auto 模式自动降级
+   # Provider A 失败 → Provider B → Provider C
+   # 无需手动处理
+   ```
+
+4. **验证健康状态**
+   ```bash
+   free-vision doctor  # 查看所有 Provider 状态
+   ```
+
+#### ❌ 避免做法
+
+1. **不要把图片发给不需要的 API**
+   ```bash
+   # ❌ 错误：把完整图片发给主模型
+   # ✅ 正确：只把 VEP 发给主模型
+   ```
+
+2. **不要在 Prompt 中包含 API Key**
+   ```bash
+   # ❌ 错误
+   echo "API Key 是 sk-xxx" | free-vision ...
+
+   # ✅ 正确：使用 Keychain 或 .env
+   free-vision login zhipu
+   ```
+
+3. **不要发送通用问题**
+   ```bash
+   # ❌ 避免：浪费 tokens
+   --question "描述这张图片的所有内容"
+
+   # ✅ 只问你需要的信息
+   --question "列出所有 UI 问题"
+   ```
+
+### CLI 命令参考
+
+```bash
+# 视觉分析
+free-vision see --image <path> --question <问题> [--json] [--provider <id>] [--no-cache]
+
+# 列出 Provider
+free-vision providers
+
+# 健康检查
+free-vision doctor
+
+# 配置 API Key
+free-vision login <provider>
+free-vision logout <provider>
+
+# 帮助
+free-vision --help
+```
+
+### 环境变量
+
+| 变量 | 说明 | 默认值 |
+|------|------|--------|
+| `VISION_PROVIDER` | 默认 Provider | `auto` |
+| `VISION_REGION` | 默认区域 | `cn` |
+| `VISION_MODEL` | 默认模型 | Provider 默认 |
+| `VISION_MAX_OUTPUT_TOKENS` | 最大输出 tokens | `220` |
+| `VISION_TIMEOUT_MS` | 超时时间（ms） | `45000` |
+| `VEP_MAX_CHARS` | VEP 最大字符数 | `520` |
+
+### 常见场景
+
+#### 场景 1：分析错误截图
+```bash
+# 用户上传了 error.png
+IMAGE="./error.png"
+free-vision see --image "$IMAGE" --question "只提取错误信息和行号"
+
+# VEP 输出
+# VEP/1|src=zhipu/...|m=error|a="Cannot find module"|t="src/app.ts:42"|c=0.97
+# → 基于 VEP 继续推理
+```
+
+#### 场景 2：审查 UI 截图
+```bash
+IMAGE="./ui-screenshot.png"
+free-vision see --image "$IMAGE" --question "列出所有 UI 问题"
+
+# VEP 输出
+# VEP/1|src=zhipu/...|m=ui|o=[{name:"Submit",issue:"disabled"},...]|c=0.95
+# → 基于 VEP 生成修复建议
+```
+
+#### 场景 3：提取表格数据
+```bash
+IMAGE="./table.png"
+free-vision see --image "$IMAGE" --question "提取表格结构"
+
+# VEP 输出
+# VEP/1|src=zhipu/...|m=ocr|a="Q3 销售报表"|t=[["产品","销售额"],["A",12000],...]|c=0.92
+# → 基于 VEP 进行数据分析
+```
+
+### 故障排除
+
+#### 问题：No credential for <provider>
+```bash
+# 解决：配置 API Key
+free-vision login <provider>
+```
+
+#### 问题：Connection timeout
+```bash
+# 解决：更换 Provider 或检查网络
+export VISION_PROVIDER=openrouter
+```
+
+#### 问题：Rate limited
+```bash
+# 解决：等待或使用不同 Provider
+# auto 模式会自动降级
+```
+
+#### 问题：Image not found
+```bash
+# 解决：检查路径
+ls -la <image-path>
+free-vision see --image ./relative/path.png ...
+```
+
+### 更多信息
+
+- **完整文档**: [docs/](docs/)
+- **VEP 协议**: [docs/VEP.md](docs/VEP.md)
+- **Provider 列表**: [docs/PROVIDERS.md](docs/PROVIDERS.md)
+- **集成示例**: [examples/](examples/)
+- **安全问题**: [docs/SECURITY.md](docs/SECURITY.md)
 
 ---
 

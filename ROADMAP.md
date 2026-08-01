@@ -12,18 +12,30 @@
 - [x] 完整中文文档
 - [x] 英文文档框架
 
-## 🚧 v0.2 — 集成增强版（当前目标）
+## 🚧 v0.2 — 集成增强版（已完成 ✅）
 
-### 🔴 P0 — 必须完成
+### ✅ P0 — 必须完成
 
-- [ ] **Claude Code Hook** — 自动检测图片并调用
-- [ ] **Provider 健康检查** — `free-vision doctor` 增强
+- [x] **Claude Code Hook** — 自动检测图片并调用
+  - [x] 创建 Hook 脚本
+  - [x] 实现图片检测
+  - [x] 智能问题生成（8 种图片类型）
+- [x] **Provider 健康检查** — `free-vision doctor` 增强
+  - [x] 创建 `src/health.ts`
+  - [x] 实时健康检查
+  - [x] 彩色输出
+  - [x] 延迟测量
 
-### 🟡 P1 — 应该完成
+### ✅ P1 — 应该完成
 
-- [ ] **Codex 一键安装** — `codex install free-vision`
-- [ ] **OpenCode Agent** — 集成文档和配置
-- [ ] **图片自动裁剪** — `--auto-crop` 基础功能
+- [x] **Codex 一键安装** — `codex install free-vision`
+  - [x] 创建安装脚本
+  - [x] 配置合并和备份
+  - [x] 交互式测试
+- [x] **OpenCode Agent** — 集成文档和配置
+  - [x] 完整配置示例
+  - [x] 故障排除指南
+- [ ] **图片自动裁剪** — `--auto-crop` 基础功能（延迟到 v0.3）
 
 ### 🟢 P2 — 可以完成
 
