@@ -46,7 +46,8 @@
     "providers": "tsx src/cli.ts providers",
     "login": "tsx src/cli.ts login",
     "logout": "tsx src/cli.ts logout",
-    "test": "tsx --test tests/*.test.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
     "check": "npm run typecheck && npm test",
     "prepublishOnly": "npm run check && npm run build"

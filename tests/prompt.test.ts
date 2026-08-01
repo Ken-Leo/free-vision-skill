@@ -1,19 +1,20 @@
-import test from "node:test";
-import assert from "node:assert/strict";
+import { describe, it, expect } from "vitest";
 import { inferMode } from "../src/prompt.js";
 
-test("infers error mode", () => {
-  assert.equal(inferMode("提取截图中的错误和行号"), "error");
-});
+describe("Prompt Mode Inference", () => {
+  it("infers error mode", () => {
+    expect(inferMode("提取截图中的错误和行号")).toBe("error");
+  });
 
-test("infers OCR mode", () => {
-  assert.equal(inferMode("读取海报里的文字和价格"), "ocr");
-});
+  it("infers OCR mode", () => {
+    expect(inferMode("读取海报里的文字和价格")).toBe("ocr");
+  });
 
-test("infers chart mode", () => {
-  assert.equal(inferMode("总结图表趋势和关键指标"), "chart");
-});
+  it("infers chart mode", () => {
+    expect(inferMode("总结图表趋势和关键指标")).toBe("chart");
+  });
 
-test("infers UI mode", () => {
-  assert.equal(inferMode("哪个按钮被禁用了？"), "ui");
+  it("infers UI mode", () => {
+    expect(inferMode("哪个按钮被禁用了？")).toBe("ui");
+  });
 });
