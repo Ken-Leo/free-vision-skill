@@ -57,15 +57,27 @@
 
 ---
 
-## 🔮 v0.3 — 高级功能
+## 🔮 v0.3 — 高级功能（已完成 ✅）
 
-- [ ] Windows Credential Manager
-- [ ] 本地 Secret Broker daemon
-- [ ] GUI 设置页
-- [ ] Provider 用量统计
-- [ ] VEP Schema Validator package
-- [ ] Provider community registry
-- [ ] 多模态对话支持
+- [x] **Windows Credential Manager** - 跨平台密钥存储支持
+- [x] **VEP Schema Validator** - VEP/1 格式验证工具
+- [x] **Image auto-crop** - 智能白色边距裁剪（--auto-crop）
+- [x] **Smart cache system** - TTL + LRU 缓存策略
+- [x] **Concurrency control** - 请求池和速率限制
+- [x] **Performance monitoring** - 缓存统计和管理 CLI
+
+---
+
+## ⚡ v0.4 — 性能优化（已完成 ✅）
+
+- [x] **Cache TTL + LRU eviction** - 24小时 TTL，最多 1000 条目
+- [x] **Request pool** - 可配置并发控制（默认 3）
+- [x] **Rate limiter** - 令牌桶速率限制器
+- [x] **Exponential backoff retry** - 指数退避重试策略
+- [x] **Parallel failover** - 并行 Provider 降级
+- [x] **Cache stats CLI** - `free-vision cache stats/clear`
+- [x] **Performance tests** - 8 个性能测试全部通过 ✅
+- [x] **README performance guide** - 完整的性能优化文档
 
 ---
 

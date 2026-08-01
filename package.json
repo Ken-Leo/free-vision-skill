@@ -1,6 +1,6 @@
 {
   "name": "free-vision-skill",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "A low-token visual evidence compiler for text-only coding agents.",
   "type": "module",
   "license": "MIT",
