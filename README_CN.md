@@ -1,10 +1,8 @@
-# Free Vision Skill 中文文档
+# 中文文档
 
-> 📖 **README 已是完整中文版**
+> 📖 **完整中文文档请查看 [README.md](README.md)**
 >
-> 本仓库的 [README.md](README.md) 包含完整的中文文档。
->
-> 如需英文版本，请查看 [README_EN.md](README_EN.md)（计划于 v0.2 发布）。
+> 本仓库的主 README 文件包含完整的中文文档。
 
 ---
 
@@ -35,4 +33,4 @@
 npx skills add lora-sys/free-vision-skill
 ```
 
-详细见 [README.md](README.md)
+详细文档请查看 [README.md](README.md)
