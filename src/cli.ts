@@ -14,12 +14,11 @@ import { buildPrompt, inferMode } from "./prompt.js";
 import { callVision } from "./call.js";
 import { parseVisionResult, toVep } from "./vep.js";
 import {
-  cacheGet,
-  cacheSet,
   normalizeQuestion,
   readImageAsDataUrl,
   sha256
 } from "./util.js";
+import { cacheGet, cacheSet, cacheCleanup, cacheGetStats } from "./cache.js";
 import {
   deleteProviderKey,
   readSecret,
@@ -58,6 +57,7 @@ Usage:
   free-vision see --image ./screen.png --question "截图里是什么错误？"
   free-vision providers
   free-vision doctor
+  free-vision cache [clear|stats]
   free-vision login zhipu
   free-vision logout zhipu
 
@@ -145,7 +145,9 @@ async function see(args: CliArgs): Promise<void> {
         ])
       );
 
-      if (!args["no-cache"]) {
+      // 检查缓存（--no-cache 时跳过）
+      const useCache = !args["no-cache"];
+      if (useCache) {
         const cached = await cacheGet(cacheKey);
         if (cached) {
           const result = parseVisionResult(
@@ -162,6 +164,9 @@ async function see(args: CliArgs): Promise<void> {
           );
           return;
         }
+      } else {
+        // --no-cache: 删除旧缓存
+        await (await import("./cache.js")).cacheManager.delete(cacheKey);
       }
 
       const raw = await callVision({
@@ -303,6 +308,40 @@ async function logout(providerId: string | undefined): Promise<void> {
   console.log(`Removed ${providerId} credential from the OS keychain.`);
 }
 
+async function cacheStats(): Promise<void> {
+  const stats = cacheGetStats();
+  const total = stats.hits + stats.misses;
+
+  console.log("Cache Statistics:\n");
+  console.log(`  Hit Rate:     ${(stats.hitRate * 100).toFixed(1)}% (${stats.hits}/${total})`);
+  console.log(`  Misses:       ${stats.misses}`);
+  console.log(`  Evictions:    ${stats.evictions}`);
+  console.log(`  Size:         ${stats.size} entries`);
+  console.log(`  Max Limit:    1000 entries`);
+
+  if (stats.hitRate > 0.5) {
+    console.log("\n✅ Cache is effective (>50% hit rate)");
+  } else if (total > 0) {
+    console.log("\n⚠️  Low cache hit rate (<50%)");
+  }
+}
+
+async function cacheClear(): Promise<void> {
+  await (await import("./cache.js")).cacheManager.clear();
+  console.log("✅ Cache cleared");
+}
+
+async function handleCache(subcommand: string | undefined): Promise<void> {
+  if (!subcommand || subcommand === "stats") {
+    await cacheStats();
+  } else if (subcommand === "clear") {
+    await cacheClear();
+  } else {
+    console.error(`Unknown cache command: ${subcommand}`);
+    usage();
+  }
+}
+
 async function main(): Promise<void> {
   const [command, positional, ...rest] = process.argv.slice(2);
   const args = parseArgs([positional, ...rest].filter(Boolean) as string[]);
@@ -310,6 +349,7 @@ async function main(): Promise<void> {
   if (command === "see") await see(args);
   else if (command === "providers") await providers();
   else if (command === "doctor") await doctor();
+  else if (command === "cache") await handleCache(positional);
   else if (command === "login") await login(positional);
   else if (command === "logout") await logout(positional);
   else usage();
