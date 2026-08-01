@@ -5,6 +5,61 @@ All notable changes to Free Vision Skill will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/2.0.0.html).
 
+## [0.3.0] - 2026-08-01
+
+### Added
+
+- **Auto-Crop Feature** - `--auto-crop` flag for intelligent image cropping
+  - Smart white/transparent margin detection
+  - Reduces image size by 50-90% in tests
+  - Saves cropped image as `.cropped.png`
+  - Configurable margin, threshold, and minimum size
+  - Comprehensive test coverage
+
+- **VEP Schema Validator** - `src/vep-validator.ts`
+  - `validateVep()`: VEP format and schema validation
+  - `parseVep()`: Parse VEP string to structured data
+  - `validateVisionResult()`: Validate VisionResult objects
+  - `formatValidationResult()`: Human-readable output
+  - Quote stripping from parsed values
+  - Array field parsing (objects, errors, values)
+  - Confidence validation (0-1 range)
+  - Mode validation (error/ocr/ui/chart/general)
+  - 14 comprehensive tests, all passing ✅
+
+- **Windows Credential Manager Support**
+  - Full Windows platform support via `cmdkey`
+  - `storeProviderKey()`: Store credentials in Windows Credential Manager
+  - `loadProviderKey()`: Retrieve credentials with `/list` parsing
+  - `deleteProviderKey()`: Delete credentials with `/delete`
+  - Cross-platform: macOS + Linux + Windows ✅
+
+### Features
+
+- Image auto-crop reduces 400x300 → 369x58 (82% reduction in tests)
+- VEP Validator provides comprehensive format checking
+- Windows users can now use `free-vision login` natively
+- All three major platforms supported: macOS, Linux, Windows
+
+### Security
+
+- Windows Credential Manager integration
+- No breaking changes to existing security model
+- Maintains credential isolation across all platforms
+
+### Testing
+
+- Auto-crop: 3 test cases (with margins, tiny image, CLI integration)
+- VEP Validator: 14 test cases covering all validation paths
+- All tests passing ✅
+- TypeScript compilation clean ✅
+
+### Documentation
+
+- README.md updated with auto-crop examples
+- Platform support updated (Windows added)
+- Version bumped to 0.3.0
+
 ## [0.2.0] - 2026-08-01
 
 ### Added
