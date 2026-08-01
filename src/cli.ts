@@ -31,6 +31,7 @@ import {
   getStatusIcon,
   type HealthStatus
 } from "./health.js";
+import { autoCrop, formatCropResult } from "./crop.js";
 
 function parseArgs(argv: string[]): CliArgs {
   const result: CliArgs = {};
@@ -65,6 +66,7 @@ Options:
   --region cn|global
   --json          Print compact JSON instead of VEP
   --no-cache      Ignore local cache
+  --auto-crop     Auto-crop white margins from image
   --max-chars 520 Maximum VEP characters
 `);
   process.exit(1);
@@ -101,8 +103,30 @@ async function see(args: CliArgs): Promise<void> {
   const prompt = buildPrompt(question, mode);
 
   const absolute = path.resolve(imagePath);
-  const imageBytes = await readFile(absolute);
-  const imageDataUrl = await readImageAsDataUrl(absolute);
+  let imageBytes: Buffer;
+  let imageDataUrl: string;
+  let actualImagePath = absolute;
+
+  // Auto-crop if requested
+  if (args["auto-crop"]) {
+    try {
+      const cropResult = await autoCrop(absolute);
+      if (cropResult.cropped) {
+        console.error(`\n${formatCropResult(cropResult)}`);
+        actualImagePath = cropResult.savedPath!;
+      } else {
+        console.error(`\n✂️  Crop skipped: ${cropResult.reason}`);
+      }
+    } catch (cropError) {
+      console.error(
+        `\n⚠️  Auto-crop failed: ${cropError instanceof Error ? cropError.message : String(cropError)}`
+      );
+      // Continue with original image
+    }
+  }
+
+  imageBytes = await readFile(actualImagePath);
+  imageDataUrl = await readImageAsDataUrl(actualImagePath);
   const providers = resolveProviderOrder(requested, region);
   const errors: string[] = [];
 
