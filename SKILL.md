@@ -52,12 +52,68 @@ Analyze everything, reason through the bug and write the final solution.
 
 ## Trigger
 
-Use this skill only when all are true:
+Use this skill **ONLY when ALL of the following are true**:
 
-1. An image is available.
-2. The task depends on visible image content.
-3. The current model cannot inspect the image directly.
-4. Text, source files, logs, DOM or accessibility data are insufficient.
+1. ✅ **An image is available** (user uploaded or referenced a local image file)
+2. ✅ **The task depends on visible image content** (not just metadata or text)
+3. ✅ **The current model cannot inspect the image directly** (text-only model or file system access only)
+4. ✅ **Other data sources are insufficient** (text, source files, logs, DOM don't contain the answer)
+
+## Trigger Detection - Critical
+
+### ❌ WRONG: Blaming the user
+```
+"The image file appears to be corrupted or in an unsupported format"
+```
+
+This is a **false diagnosis**. The real issue is that **you (the text model) cannot read image pixels**.
+
+### ✅ CORRECT: Self-detection flow
+
+When user provides an image, follow this **decision tree IN ORDER**:
+
+```
+STEP 1: Attempt to read the image (e.g., Read tool or file inspection)
+   ↓
+STEP 2: Check for these "signal errors":
+   ❌ "Unsupported format" / "cannot read image" / "binary file"
+   ❌ "Failed to read" / "corrupted" (on image files)
+   ↓
+STEP 3: If signal error detected → THIS IS THE TRIGGER
+   ✅ DO NOT diagnose the image as "corrupted"
+   ✅ IMMEDIATELY invoke Free Vision Skill
+   ↓
+STEP 4: Execute:
+   npm run see -- \
+     --image "<image-path>" \
+     --question "<focused visual question>"
+```
+
+### 🔑 Key Signals You Can't Read Images
+
+| Signal | Meaning |
+|---|---|
+| "Unsupported format" | You lack pixel-reading capability |
+| "Failed to read image" | You can't inspect image content |
+| "Binary file" | Image is binary data you can't parse |
+| Any "cannot open" on image extensions | You lack vision tools |
+
+### 🚨 Never Do This
+
+- ❌ **Never blame the user** for "corrupted images" — you simply can't see them
+- ❌ **Never ask user to "open in Preview"** — that's their problem, not yours
+- ❌ **Never suggest "re-upload"** — you need a different tool, not a new upload
+- ✅ **ALWAYS trigger Free Vision Skill** when you hit the signals above
+
+### ✅ Correct Pattern
+
+```
+User: [attaches screenshot.png]
+You: "I can't directly view images. Let me use Free Vision Skill to analyze this for you."
+     → npm run see -- --image screenshot.png --question "Extract only the error message and file path"
+     [Receives VEP output]
+You: [Reason based on VEP evidence + your own codebase knowledge]
+```
 
 ## Command
 
