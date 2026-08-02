@@ -17,6 +17,10 @@
 
 ---
 
+<img src="./assets/readme/hero.svg" alt="Free Vision Skill: 将图片压缩为 VEP 证据包（50-150 tokens），让文本模型也能看见" width="100%"/>
+
+---
+
 ## 🎯 为什么需要它？
 
 **问题：** DeepSeek-V4-Flash、Claude Code CLI 等文本模型**无法直接读取图片**，但经常需要分析截图、UI、图表等视觉内容。
@@ -28,8 +32,14 @@
 - ❌ 视觉模型越权推理
 
 **Free Vision Skill 的方案：**
-```
-图片 → 视觉提取（只提取事实）→ VEP 证据包（50-150 tokens）→ 主模型推理
+
+```mermaid
+graph LR
+    A[图片] --> B[视觉提取]
+    B --> C[VEP/1 证据包]
+    C --> D[主模型推理]
+    style C fill:#7ee787,color:#07090c
+    style D fill:#0d1116,color:#e6edf3
 ```
 
 **核心价值：**
@@ -95,20 +105,11 @@ free-vision see --image ./invoice.png --json --question "提取发票金额和�
 
 ### Token 对比
 
-| 方案 | Token 消耗 | 节省 |
-|------|-----------|------|
-| **传统方案**（完整视觉描述） | 2000-5000 | - |
-| **Free Vision Skill**（VEP 协议） | **50-150** | **90-95%** ✨ |
+<img src="./assets/readme/token-comparison.svg" alt="Token 对比：传统方案 2000-5000 tokens vs Free Vision Skill 50-150 tokens，节省 90-95%" width="100%"/>
 
 ### VEP 输出示例
 
-```text
-VEP/1|src=zhipu/glm-4.6v-flash|m=error|
-a="Cannot find module 'lodash'"|
-t="webpack.config.js:15"|
-e=[module resolution error]|
-c=0.98
-```
+<img src="./assets/readme/vep-example.svg" alt="VEP/1 协议格式和字段说明示例" width="100%"/>
 
 **字段说明：**
 - `src` — Provider 和模型

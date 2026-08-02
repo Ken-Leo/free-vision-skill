@@ -1,0 +1,193 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="1200" height="380" viewBox="0 0 1200 380"
+     role="img" aria-labelledby="hero-title hero-desc">
+  <title id="hero-title">Free Vision Skill — 给模型一双眼睛</title>
+  <desc id="hero-desc">将图片压缩为 VEP 证据包，让文本模型也能低成本看见</desc>
+
+  <defs>
+    <!-- Background gradient -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0d1116;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#161b22;stop-opacity:1" />
+    </linearGradient>
+
+    <!-- Eye glow effect -->
+    <filter id="eyeGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Grid pattern -->
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#1b232c" stroke-width="0.5"/>
+    </pattern>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="380" fill="url(#bgGrad)"/>
+  <rect width="1200" height="380" fill="url(#grid)" opacity="0.3"/>
+
+  <!-- Left side: Title and description -->
+  <g id="title-block" transform="translate(80 60)">
+    <!-- Category tag -->
+    <text x="0" y="0"
+          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+          font-size="16" font-weight="500" fill="#38bdf8" letter-spacing="0.1em">
+      AGENT SKILL · VISION API
+    </text>
+
+    <!-- Main title -->
+    <text x="0" y="60"
+          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+          font-size="64" font-weight="700" fill="#e6edf3" letter-spacing="-0.02em">
+      Free Vision
+    </text>
+    <text x="0" y="120"
+          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+          font-size="64" font-weight="700" fill="#7ee787" letter-spacing="-0.02em">
+      Skill
+    </text>
+
+    <!-- Eye icon -->
+    <g transform="translate(460 -20)" filter="url(#eyeGlow)">
+      <circle cx="0" cy="0" r="32" fill="none" stroke="#7ee787" stroke-width="2.5"/>
+      <circle cx="0" cy="0" r="18" fill="#7ee787" opacity="0.3"/>
+      <circle cx="0" cy="0" r="8" fill="#7ee787"/>
+    </g>
+
+    <!-- Subtitle -->
+    <text x="0" y="180"
+          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+          font-size="22" font-weight="400" fill="#8b98a5">
+      给没有视觉能力的模型，装上一双按需调用的眼睛
+    </text>
+
+    <!-- Description -->
+    <text x="0" y="220"
+          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+          font-size="16" font-weight="400" fill="#e6edf3">
+      将图片压缩为
+      <tspan fill="#7ee787" font-weight="600"> 50-150 tokens 的极简 VEP</tspan>
+      证据包
+    </text>
+    <text x="0" y="245"
+          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+          font-size="16" font-weight="400" fill="#e6edf3">
+      让文本模型也能低成本"看见"
+    </text>
+
+    <!-- Token savings highlight -->
+    <g transform="translate(0 280)">
+      <rect x="0" y="0" width="480" height="48" rx="8" fill="#7ee787" opacity="0.15" stroke="#7ee787" stroke-width="1"/>
+      <text x="20" y="30"
+            font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+            font-size="18" font-weight="600" fill="#7ee787">
+        🎯 节省 90-95% tokens（50-150 vs 2000-5000）
+      </text>
+    </g>
+  </g>
+
+  <!-- Right side: VEP flow visualization -->
+  <g id="project-proof" transform="translate(680 80)">
+    <!-- Flow container -->
+    <rect x="0" y="0" width="440" height="220" rx="12" fill="#161b22" stroke="#1b232c" stroke-width="1"/>
+
+    <!-- Flow title -->
+    <text x="220" y="35"
+          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+          font-size="14" font-weight="600" fill="#8b98a5" text-anchor="middle" letter-spacing="0.1em">
+      WORKFLOW
+    </text>
+
+    <!-- Step 1: Image -->
+    <g transform="translate(20 60)">
+      <rect x="0" y="0" width="100" height="80" rx="6" fill="#0d1116" stroke="#1b232c" stroke-width="1"/>
+      <text x="50" y="35"
+            font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+            font-size="12" font-weight="600" fill="#e6edf3" text-anchor="middle">
+        图片
+      </text>
+      <text x="50" y="55"
+            font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+            font-size="10" fill="#8b98a5" text-anchor="middle">
+        Image
+      </text>
+    </g>
+
+    <!-- Arrow 1 -->
+    <path d="M 130 100 L 190 100" stroke="#38bdf8" stroke-width="2" marker-end="url(#arrowBlue)"/>
+
+    <!-- Step 2: Visual API -->
+    <g transform="translate(200 60)">
+      <rect x="0" y="0" width="100" height="80" rx="6" fill="#0d1116" stroke="#38bdf8" stroke-width="1.5"/>
+      <text x="50" y="35"
+            font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+            font-size="12" font-weight="600" fill="#38bdf8" text-anchor="middle">
+        视觉提取
+      </text>
+      <text x="50" y="55"
+            font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+            font-size="10" fill="#8b98a5" text-anchor="middle">
+        Visual API
+      </text>
+    </g>
+
+    <!-- Arrow 2 -->
+    <path d="M 310 100 L 370 100" stroke="#7ee787" stroke-width="2" marker-end="url(#arrowGreen)"/>
+
+    <!-- Step 3: VEP -->
+    <g transform="translate(320 60)">
+      <rect x="0" y="0" width="100" height="80" rx="6" fill="#7ee787" opacity="0.15" stroke="#7ee787" stroke-width="2"/>
+      <text x="50" y="35"
+            font-family="ui-monospace, SFMono-Regular, monospace"
+            font-size="11" font-weight="600" fill="#7ee787" text-anchor="middle">
+        VEP/1
+      </text>
+      <text x="50" y="55"
+            font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+            font-size="10" fill="#8b98a5" text-anchor="middle">
+        Evidence
+      </text>
+    </g>
+
+    <!-- Step 4: Main Model -->
+    <g transform="translate(20 160)">
+      <rect x="0" y="0" width="400" height="48" rx="6" fill="#1b232c" opacity="0.5"/>
+      <text x="200" y="30"
+            font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+            font-size="14" font-weight="600" fill="#e6edf3" text-anchor="middle">
+        主模型推理（DeepSeek / Claude Code / Codex）
+      </text>
+    </g>
+
+    <!-- Token comparison -->
+    <g transform="translate(20 220)">
+      <text x="0" y="0"
+            font-family="ui-monospace, SFMono-Regular, monospace"
+            font-size="11" fill="#8b98a5">
+        传统: 2000-5000 tokens
+      </text>
+      <text x="210" y="0"
+            font-family="ui-monospace, SFMono-Regular, monospace"
+            font-size="11" fill="#7ee787" font-weight="600">
+        → VEP: 50-150 tokens ✨
+      </text>
+    </g>
+  </g>
+
+  <!-- Arrow markers -->
+  <defs>
+    <marker id="arrowBlue" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#38bdf8"/>
+    </marker>
+    <marker id="arrowGreen" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#7ee787"/>
+    </marker>
+  </defs>
+
+  <!-- Bottom accent line -->
+  <rect x="80" y="360" width="400" height="3" rx="1.5" fill="#7ee787" opacity="0.3"/>
+</svg>
