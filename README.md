@@ -1,44 +1,45 @@
 # Free Vision Skill 👁️
 
-> 给没有视觉能力的模型，装上一双按需调发的眼睛。
+> 给没有视觉能力的模型，装上一双按需调用的眼睛。
 > A low-token visual evidence compiler for text-only coding agents.
 
-<p align="center">
+<div align="center">
 
-[![MIT License](https://img.shields.io/badge/license-MIT-0ea5e9)](./LICENSE)
-[![Node 20+](https://img.shields.io/badge/node-%3E%3D20-22c55e)](https://nodejs.org/)
-[![VEP Protocol](https://img.shields.io/badge/output-VEP%2F1-38bdf8)](./docs/VEP.md)
-[![For Text-Only Agents](https://img.shields.io/badge/for-text--only_agents-white)](./docs/AGENT_INTEGRATION.md)
-[![Version](https://img.shields.io/badge/version-0.4.0-blue)](./CHANGELOG.md)
-[![CI/CD](https://img.shields.io/badge/CI%2FCD-passing-brightgreen)](https://github.com/lora-sys/free-vision-skill/actions/workflows/ci.yml)
-[![Tests](https://img.shields.io/badge/tests-30%2F30%20passing-success)](./tests)
+[![MIT License](https://img.shields.io/badge/license-MIT-0ea5e9?style=flat-square)](./LICENSE)
+[![Node 20+](https://img.shields.io/badge/node-%3E%3D20-22c55e?style=flat-square)](https://nodejs.org/)
+[![VEP/1 Protocol](https://img.shields.io/badge/output-VEP%2F1-38bdf8?style=flat-square)](./docs/VEP.md)
+[![Text-Only Agents](https://img.shields.io/badge/for-text--only_agents-white?style=flat-square)](./docs/AGENT_INTEGRATION.md)
+[![v0.4.0](https://img.shields.io/badge/version-0.4.0-blue?style=flat-square)](./CHANGELOG.md)
+[![CI/CD](https://img.shields.io/badge/CI%2FCD-passing-brightgreen?style=flat-square)](https://github.com/lora-sys/free-vision-skill/actions/workflows/ci.yml)
+[![30/30 Tests](https://img.shields.io/badge/tests-30%2F30%20passing-success?style=flat-square)](./tests)
 
-</p>
-
----
-
-## 🎯 一句话说明
-
-把图片压缩成 **50-150 tokens 的极简 VEP 证据包**，让文本模型也能低成本"看见"。
+</div>
 
 ---
 
-## ✨ 核心特性
+## 🎯 为什么需要它？
 
-| 特性 | 说明 |
-|------|------|
-| 🎯 **极低 Token** | 50-150 tokens，比完整描述节省 **90-95%** |
-| ⚡ **性能优化** | 智能缓存 + 并发控制，健康检查 **32.5x 更快** |
-| 🔐 **安全存储** | macOS Keychain + Linux Secret Service + Windows Credential Manager |
-| 🌍 **13 个 Provider** | 国内 4 + 全球 9，自动降级 |
-| 🚨 **强制触发检测** | 模型无法读图时自动触发，不再误诊为"图片损坏" |
-| ✂️ **智能裁剪** | 自动检测边距，减少 50-90% 图片大小 |
+**问题：** DeepSeek-V4-Flash、Claude Code CLI 等文本模型**无法直接读取图片**，但经常需要分析截图、UI、图表等视觉内容。
 
-**详细文档：** [核心特性详解](./docs/FEATURES.md)
+**传统方案：** 把图片交给视觉模型，生成 2000-5000 tokens 的长描述 → 主模型处理
+- ❌ Token 消耗高
+- ❌ 无关描述多
+- ❌ 上下文污染
+- ❌ 视觉模型越权推理
+
+**Free Vision Skill 的方案：**
+```
+图片 → 视觉提取（只提取事实）→ VEP 证据包（50-150 tokens）→ 主模型推理
+```
+
+**核心价值：**
+- ✅ **90-95% Token 节省**（50-150 tokens vs 2000-5000）
+- ✅ **视觉模型只负责看见**，主模型继续负责思考
+- ✅ **强制触发检测** — 模型无法读图时自动触发，不再误诊为"图片损坏"
 
 ---
 
-## 🚀 快速开始
+## ⚡ 快速开始
 
 ### 安装
 
@@ -99,28 +100,9 @@ free-vision see --image ./invoice.png --json --question "提取发票金额和�
 | **传统方案**（完整视觉描述） | 2000-5000 | - |
 | **Free Vision Skill**（VEP 协议） | **50-150** | **90-95%** ✨ |
 
-**详细对比：** [Token 经济学](./docs/TOKEN_ECONOMICS.md)
+### VEP 输出示例
 
-### 工作原理
-
-```mermaid
-graph LR
-    A[图片] --> B[视觉提取]
-    B --> C[VEP/1 证据包]
-    C --> D[主模型推理]
-    style C fill:#7ee787,color:#07090c
-    style D fill:#0d1116,color:#e6edf3
-```
-
----
-
-## 📚 核心概念
-
-### VEP: Visual Evidence Packet
-
-**VEP = 视觉证据包**，格式：
-
-```
+```text
 VEP/1|src=zhipu/glm-4.6v-flash|m=error|
 a="Cannot find module 'lodash'"|
 t="webpack.config.js:15"|
@@ -128,36 +110,30 @@ e=[module resolution error]|
 c=0.98
 ```
 
-**VEP 协议规范：** [VEP.md](./docs/VEP.md)
+**字段说明：**
+- `src` — Provider 和模型
+- `m` — 任务模式（error / ocr / ui / chart）
+- `a` — 直接答案
+- `t` — OCR 文本
+- `e` — 可见错误
+- `c` — 置信度（0-1）
+
+**详细协议：** [VEP 规范](./docs/VEP.md)
 
 ---
 
-## 🤔 为什么需要它？
+## ✨ 核心特性
 
-### ❌ 传统方案的问题
-
-| 问题 | 影响 |
+| 特性 | 说明 |
 |------|------|
-| 💸 Token 消耗高 | 2000-5000 tokens/次 |
-| 🗑️ 无关描述多 | 视觉模型输出大量不需要的内容 |
-| 🧹 上下文污染 | 主模型上下文被长描述占满 |
-| 🧠 越权推理 | 视觉模型替主模型做决策 |
+| 🎯 **极低 Token** | 50-150 tokens，比完整描述节省 **90-95%** |
+| ⚡ **性能优化** | 智能缓存 + 并发控制，健康检查 **32.5x 更快** |
+| 🔐 **安全存储** | macOS Keychain + Linux Secret Service + Windows Credential Manager |
+| 🌍 **13 个 Provider** | 国内 4 + 全球 9，自动降级 |
+| 🚨 **强制触发检测** | 模型无法读图时自动触发，不再误诊为"图片损坏" |
+| ✂️ **智能裁剪** | 自动检测边距，减少 50-90% 图片大小 |
 
-### ✅ Free Vision Skill 的方案
-
-```
-图片
-  ↓
-视觉 API（只提取任务需要的事实）
-  ↓
-VEP 证据包（50-150 tokens）
-  ↓
-主模型继续推理
-```
-
-**视觉模型只负责看见，主模型继续负责思考。**
-
-**完整对比：** [为什么需要 Free Vision Skill](./docs/WHY_VISION.md)
+**详细文档：** [核心特性详解](./docs/FEATURES.md)
 
 ---
 
@@ -203,21 +179,21 @@ VEP 证据包（50-150 tokens）
 ## 📖 文档导航
 
 ### 🚀 快速上手
-- **[安装指南](./docs/INSTALLATION.md)** — 详细安装步骤
-- **[配置指南](./docs/SETUP.md)** — API Key 配置
 - **[快速开始](./docs/QUICKSTART.md)** — 5 分钟上手
+- **[安装指南](./docs/INSTALLATION.md)** — 多种安装方式对比
+- **[配置指南](./docs/SETUP.md)** — API Key 配置
 
 ### 💡 核心文档
 - **[VEP 协议](./docs/VEP.md)** — Visual Evidence Packet 规范
 - **[架构设计](./docs/ARCHITECTURE.md)** — 系统设计
 - **[使用场景](./docs/USE_CASES.md)** — 常见场景示例
 - **[Token 经济学](./docs/TOKEN_ECONOMICS.md)** — Token 对比分析
-- **[核心特性](./docs/FEATURES.md)** — 特性详解
+- **[为什么需要它](./docs/WHY_VISION.md)** — 解决的问题
 
 ### 🛠️ 集成
 - **[Agent 集成](./docs/AGENT_INTEGRATION.md)** — Claude Code / Codex / OpenCode
 - **[Provider 配置](./docs/PROVIDERS.md)** — 13 个 Provider 对比
-- **[钩子指南](./docs/HOOKS.md)** — Claude Code Hook
+- **[Claude Code Hook](./docs/INTEGRATION_CLAUDE_CODE.md)** — Hook 配置
 
 ### 🔒 安全与性能
 - **[安全策略](./docs/SECURITY.md)** — 威胁模型和防护
@@ -262,13 +238,12 @@ MIT © 2026 [lora-sys](https://github.com/lora-sys)
 
 ---
 
-<p align="center">
-  <strong>先看见，再压缩，再推理。</strong> 👁️<br>
-  <em>Free Vision Skill · low-token visual evidence compiler</em>
-</p>
+<div align="center">
 
-<p align="center">
-  <a href="https://github.com/lora-sys/free-vision-skill">⭐ Star on GitHub</a> ·
-  <a href="https://github.com/lora-sys/free-vision-skill/issues">🐛 Report Bug</a> ·
-  <a href="https://github.com/lora-sys/free-vision-skill/blob/main/CONTRIBUTING.md">🤝 Contribute</a>
-</p>
+### 先看见，再压缩，再推理。 👁️
+
+**Free Vision Skill** · low-token visual evidence compiler
+
+[⭐ Star](https://github.com/lora-sys/free-vision-skill) · [🐛 Issues](https://github.com/lora-sys/free-vision-skill/issues) · [🤝 Contribute](./CONTRIBUTING.md)
+
+</div>
