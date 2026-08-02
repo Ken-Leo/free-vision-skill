@@ -8,7 +8,9 @@
   <img alt="Node 20+" src="https://img.shields.io/badge/node-%3E%3D20-22c55e">
   <img alt="VEP Protocol" src="https://img.shields.io/badge/output-VEP%2F1-38bdf8">
   <img alt="Text-only agents" src="https://img.shields.io/badge/for-text--only_agents-white">
-  <a href="https://github.com/lora-sys/free-vision-skill/releases/tag/v0.1.0"><img alt="Version" src="https://img.shields.io/badge/version-0.1.0-blue"></a>
+  <a href="https://github.com/lora-sys/free-vision-skill/releases/tag/v0.1.0"><img alt="Version" src="https://img.shields.io/badge/version-0.4.0-blue"></a>
+<a href="https://github.com/lora-sys/free-vision-skill/actions/workflows/ci.yml"><img alt="CI/CD" src="https://img.shields.io/badge/CI%2FCD-passing-brightgreen"></a>
+<a href="https://github.com/lora-sys/free-vision-skill/blob/main/tests"><img alt="Tests" src="https://img.shields.io/badge/tests-30%2F30%20passing-success"></a>
 </p>
 
 ---

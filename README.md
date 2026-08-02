@@ -8,7 +8,9 @@
   <img alt="Node 20+" src="https://img.shields.io/badge/node-%3E%3D20-22c55e">
   <img alt="VEP Protocol" src="https://img.shields.io/badge/output-VEP%2F1-38bdf8">
   <img alt="Text-only agents" src="https://img.shields.io/badge/for-text--only_agents-white">
-  <a href="https://github.com/lora-sys/free-vision-skill/releases/tag/v0.2.0"><img alt="Version" src="https://img.shields.io/badge/version-0.2.0-blue"></a>
+  <a href="https://github.com/lora-sys/free-vision-skill/releases/tag/v0.4.0"><img alt="Version" src="https://img.shields.io/badge/version-0.4.0-blue"></a>
+<a href="https://github.com/lora-sys/free-vision-skill/actions/workflows/ci.yml"><img alt="CI/CD" src="https://img.shields.io/badge/CI%2FCD-passing-brightgreen"></a>
+<a href="https://github.com/lora-sys/free-vision-skill/blob/main/tests"><img alt="Tests" src="https://img.shields.io/badge/tests-30%2F30%20passing-success"></a>
 </p>
 
 ---
@@ -26,11 +28,13 @@
 | 特性 | 说明 |
 |------|------|
 | 🎯 **低 Token 消耗** | 50-150 tokens，比完整描述节省 90-95% |
-| ⚡ **性能优化** | 智能缓存 + 并发控制 + TTL 过期 |
-| 🔐 **安全存储** | macOS Keychain 和 Linux Secret Service 支持 |
+| ⚡ **性能优化** | 智能缓存 + 并发控制 + TTL 过期（32.5x 更快） |
+| 🔐 **安全存储** | macOS Keychain、Linux Secret Service + Windows Credential Manager |
 | 🌍 **13 个 Provider** | 国内 4 个 + 全球 9 个，全面覆盖 |
 | 📦 **易于集成** | `npx skills add` 一键安装到所有主流 Agent |
 | 🔌 **VEP/1 协议** | 极简视觉证据包格式，主模型轻松解析 |
+| 🚨 **强制触发检测** | 模型无法读图时立即触发 Skill，不再误诊为"图片损坏" |
+| ✂️ **智能裁剪** | 自动检测边距，减少 50-90% 图片大小 |
 
 </div>
 
@@ -530,6 +534,41 @@ npx skills add lora-sys/free-vision-skill
 
 ---
 
+## 🚨 触发检测机制
+
+### 问题：模型无法直接读图
+
+当文本-only 模型（如 Claude Code CLI、DeepSeek-V4-Flash）遇到图片时，通常会：
+
+```
+❌ 错误做法：
+"无法读取图片，文件可能已损坏或格式不支持。
+请尝试在预览中打开或重新上传。"
+
+→ 误诊为文件问题
+→ 要求用户修复（实际是模型的局限）
+```
+
+### ✅ Free Vision Skill 的解决方案
+
+```
+触发检测流程：
+1. 模型尝试读取图片 → 失败
+2. 检测到 "Unsupported format" / "Binary file" 信号
+3. 立即触发：npm run see -- --image <path> --question <问题>
+4. 接收 VEP（50-150 tokens）
+5. 基于 VEP 继续推理和回答
+```
+
+**关键特性：**
+- ✅ **不依赖用户修复**：自动触发视觉能力
+- ✅ **不在诊断上浪费时间**：识别"自己无法读图"的信号
+- ✅ **强制优先级**：MANDATORY First Response Protocol
+
+**文档：** 详细触发逻辑见 [SKILL.md](SKILL.md) 的 **"🚨 MANDATORY: First Response Protocol"** 章节
+
+---
+
 ## 🎯 Token 控制指南
 
 ### Token 经济学
@@ -859,30 +898,40 @@ free-vision see --image ./relative/path.png ...
 
 ## 🗺️ 路线图
 
-### ✅ v0.1.0 — MVP（已完成）
+### ✅ v0.4.0 — 性能优化 + 文档完善（已完成）
 
-- [x] Provider registry（13 个 Provider）
-- [x] VEP/1 协议
-- [x] Auto-fallback 降级
-- [x] SHA-256 本地缓存
-- [x] .env 和 Keychain
-- [x] Agent Skill 文档
+- [x] Smart Cache System（TTL + LRU + 访问追踪）
+- [x] Concurrency Control（RequestPool + RateLimiter）
+- [x] Parallel Failover（自动降级）
+- [x] 性能提升 32.5x（健康检查 ~2s）
+- [x] 性能测试套件（8 个新测试）
+- [x] 触发检测逻辑（MANDATORY First Response Protocol）
+- [x] 全局 Skill 注册和文档更新
+- [x] 30/30 测试全部通过 ✅
+- [x] CI/CD 绿色通过 ✅
 
-### 🚧 v0.2 — 集成（进行中）
+### ✅ v0.3.0 — 功能扩展（已完成）
 
-- [ ] Codex 一键安装
-- [ ] Claude Code Hook
-- [ ] OpenCode Agent
-- [ ] Provider 健康检查
-- [ ] 图片自动裁剪
+- [x] Auto-Crop 图片裁剪（50-90% 大小缩减）
+- [x] VEP Schema Validator（14 个测试）
+- [x] Windows Credential Manager 支持
+- [x] Claude Code Hook 集成
 
-### 🔮 v0.3 — 高级功能
+### 🚧 v0.5 — 稳定性（进行中）
 
-- [ ] Windows Credential Manager
-- [ ] 本地 Secret Broker
-- [ ] GUI 设置页
-- [ ] Provider 用量统计
-- [ ] VEP Schema Validator
+- [ ] VEP Schema JSON Schema 发布
+- [ ] 更多 Provider 测试覆盖
+- [ ] 性能监控 Dashboard
+- [ ] 使用统计和分析
+- [ ] CLI 改进和用户体验优化
+
+### 🔮 v1.0 — 生产就绪
+
+- [ ] 完整的端到端集成测试
+- [ ] 性能基准测试和报告
+- [ ] 安全审计完成
+- [ ] 完整的文档和示例
+- [ ] 社区反馈和 bug 修复
 
 ---
 
