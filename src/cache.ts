@@ -10,9 +10,29 @@
 
 import { mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
+import os from "node:os";
 import { createHash } from "node:crypto";
 
-const CACHE_DIR = path.resolve(".vision-cache");
+/**
+ * 缓存目录解析（按优先级）：
+ *   1. FREE_VISION_CACHE_DIR  — 显式覆盖
+ *   2. $XDG_CACHE_HOME/free-vision
+ *   3. ~/.cache/free-vision
+ *
+ * 必须是绝对路径且与 cwd 无关：这个 skill 会在任意仓库里被调用，
+ * 相对路径会在每个项目根目录里各留一份互不共享的缓存。
+ */
+function resolveCacheDir(): string {
+  const explicit = process.env.FREE_VISION_CACHE_DIR;
+  if (explicit) return path.resolve(explicit);
+
+  const xdg = process.env.XDG_CACHE_HOME;
+  if (xdg) return path.join(path.resolve(xdg), "free-vision");
+
+  return path.join(os.homedir(), ".cache", "free-vision");
+}
+
+const CACHE_DIR = resolveCacheDir();
 const MAX_CACHE_ENTRIES = 1000; // 最大缓存条目数
 const DEFAULT_TTL_MS = 24 * 60 * 60 * 1000; // 24 小时
 
@@ -228,4 +248,9 @@ export async function cacheCleanup(): Promise<number> {
 
 export function cacheGetStats() {
   return cacheManager.getStats();
+}
+
+/** 当前生效的缓存目录（绝对路径），用于 doctor/stats 输出与文档。 */
+export function cacheGetDir(): string {
+  return CACHE_DIR;
 }

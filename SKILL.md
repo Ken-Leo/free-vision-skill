@@ -25,7 +25,8 @@ metadata:
 
 ## 🚨 MANDATORY: First Response Protocol (READ THIS FIRST)
 
-**When user provides an image, you MUST follow this protocol BEFORE anything else:**
+**When an image is available — whether the user attached it OR a tool you called
+produced it — you MUST follow this protocol BEFORE anything else:**
 
 ```
 1. TRY to read the image (use Read tool or file inspector)
@@ -95,10 +96,40 @@ Analyze everything, reason through the bug and write the final solution.
 
 Use this skill **ONLY when ALL of the following are true**:
 
-1. ✅ **An image is available** (user uploaded or referenced a local image file)
+1. ✅ **An image is available** — from either source:
+   - **User-provided**: uploaded or referenced a local image file
+   - **Tool-produced**: a tool *you* called wrote an image to disk (see table below)
 2. ✅ **The task depends on visible image content** (not just metadata or text)
 3. ✅ **The current model cannot inspect the image directly** (text-only model or file system access only)
 4. ✅ **Other data sources are insufficient** (text, source files, logs, DOM don't contain the answer)
+
+### 📸 Tool-Produced Screenshots Count
+
+Browser-automation and capture tools return a **file path, not pixels**. When you
+called the tool yourself, there is no user to ask — so the skill applies just as much.
+
+| Source | Typical output |
+|---|---|
+| Playwright MCP `browser_take_screenshot` | `page-<timestamp>.png` |
+| `agent-browser` / `ego-browser` screenshots | capture path in tool result |
+| Chrome DevTools MCP `take_screenshot` | `filePath` you passed in |
+| Playwright / Puppeteer CLI in Bash | path from your own script |
+| `screencapture`, `import`, headless-render output | path from your own command |
+
+**Rule**: if a tool result hands you an image path and the next step needs to know
+what's *in* the picture — run Free Vision on it. Do not guess from the filename,
+the DOM snapshot, or the URL.
+
+> ⚠️ **Prefer the a11y snapshot when it answers the question.** For "is the button
+> there / what's the text", `browser_snapshot` is cheaper and exact. Reach for
+> Free Vision when the question is genuinely *visual*: layout breakage, overlap,
+> clipping, color, rendered charts, canvas/WebGL, or text baked into an image.
+
+```bash
+# After: browser_take_screenshot → /tmp/page-1738.png
+npm run see -- --image /tmp/page-1738.png \
+  --question "Only overlapping, clipped or off-screen elements."
+```
 
 ## Trigger Detection - Critical
 
@@ -111,7 +142,8 @@ This is a **false diagnosis**. The real issue is that **you (the text model) can
 
 ### ✅ CORRECT: Self-detection flow
 
-When user provides an image, follow this **decision tree IN ORDER**:
+When an image becomes available — user-attached **or** produced by a tool you
+called — follow this **decision tree IN ORDER**:
 
 ```
 STEP 1: Attempt to read the image (e.g., Read tool or file inspection)
@@ -148,12 +180,25 @@ STEP 4: Execute:
 
 ### ✅ Correct Pattern
 
+**User-attached image:**
+
 ```
 User: [attaches screenshot.png]
 You: "I can't directly view images. Let me use Free Vision Skill to analyze this for you."
      → npm run see -- --image screenshot.png --question "Extract only the error message and file path"
      [Receives VEP output]
 You: [Reason based on VEP evidence + your own codebase knowledge]
+```
+
+**Tool-produced screenshot (no user involved):**
+
+```
+You: browser_take_screenshot → /tmp/page-1738.png
+You: [cannot see pixels — do NOT narrate the page from the DOM and call it "verified"]
+     → npm run see -- --image /tmp/page-1738.png \
+         --question "Only visibly broken, overlapping or clipped elements."
+     [Receives VEP output]
+You: [Reason based on VEP evidence + the DOM snapshot you already have]
 ```
 
 ## Command
@@ -223,6 +268,26 @@ free-vision see --image chart.png \
 - Reuse the local image+question cache.
 - Escalate to a stronger provider only when evidence is incomplete.
 - Never request visual chain-of-thought.
+
+### Cache Behavior
+
+Results are cached for 24h in a **global, cwd-independent** directory:
+
+| Priority | Location |
+|---|---|
+| 1 | `$FREE_VISION_CACHE_DIR` |
+| 2 | `$XDG_CACHE_HOME/free-vision` |
+| 3 | `~/.cache/free-vision` (default) |
+
+The cache key is `sha256(image bytes + question + provider + model)`.
+
+> ⚠️ **Byte-identical images only.** Browser screenshots re-taken between runs
+> usually differ by a pixel (cursor, caret blink, animation frame, timestamp),
+> so they will **miss** the cache. Expect hits when re-asking about a *saved*
+> file, not when re-capturing a live page. Don't budget on cache hits for
+> Playwright loops — budget on asking fewer, narrower questions.
+
+Inspect with `free-vision cache stats`, reset with `free-vision cache clear`.
 
 ## Security
 

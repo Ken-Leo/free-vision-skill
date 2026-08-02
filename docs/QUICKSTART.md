@@ -123,4 +123,6 @@ The provider has no free quota remaining. Try another provider or wait for reset
 Use PNG, JPG, JPEG, GIF, or WebP.
 
 **Cache issues**
-Delete `.vision-cache/` to reset the local cache.
+Run `free-vision cache clear` to reset the local cache, or `free-vision cache stats`
+to print the active cache directory. The cache lives in `~/.cache/free-vision`
+by default; override with `FREE_VISION_CACHE_DIR` or `XDG_CACHE_HOME`.

@@ -9,7 +9,7 @@
 [![Node 20+](https://img.shields.io/badge/node-%3E%3D20-22c55e?style=flat-square)](https://nodejs.org/)
 [![VEP/1 Protocol](https://img.shields.io/badge/output-VEP%2F1-38bdf8?style=flat-square)](./docs/VEP.md)
 [![Text-Only Agents](https://img.shields.io/badge/for-text--only_agents-white?style=flat-square)](./docs/AGENT_INTEGRATION.md)
-[![v0.4.0](https://img.shields.io/badge/version-0.4.0-blue?style=flat-square)](./CHANGELOG.md)
+[![v0.4.1](https://img.shields.io/badge/version-0.4.1-blue?style=flat-square)](./CHANGELOG.md)
 [![CI/CD](https://img.shields.io/badge/CI%2FCD-passing-brightgreen?style=flat-square)](https://github.com/lora-sys/free-vision-skill/actions/workflows/ci.yml)
 [![30/30 Tests](https://img.shields.io/badge/tests-30%2F30%20passing-success?style=flat-square)](./tests)
 

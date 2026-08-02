@@ -5,6 +5,42 @@ All notable changes to Free Vision Skill will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/2.0.0.html).
 
+## [0.4.1] - 2026-08-02
+
+### Added
+
+- **Claude Code PostToolUse Hook** — automatic VEP injection on image Read
+  - `hooks/claude-code/post-read-image.sh` — fires after any `Read` of a `.png/.jpg/.webp/.gif/.bmp/.avif` file
+  - Runs `free-vision see` silently, injects VEP into `hookSpecificOutput.additionalContext`
+  - Smart question selection from filename keywords (error, screenshot, chart, table, code, …)
+  - `CACHE_HIT_SKIP` env var controls whether cached VEPs are still injected (default: skip)
+  - Configurable via `HOOK_TIMEOUT_MS` (35 s) and `MAX_VEP_CHARS` (500)
+  - Registered in `~/.claude/settings.json` → `"PostToolUse"` → matcher `"Read"`
+- **E2E Test Suite** (`tests/e2e-vep.test.js`)
+  - 20 assertions covering VEP format, cold/warm/no-cache/different-question paths
+  - `npm run test:e2e` — self-clearing cache for reproducible runs
+  - `npm run check` still covers unit tests (30/30 passing)
+
+### Changed
+
+- **Cache directory is now cwd-independent** — defaults to `~/.cache/free-vision/`
+  - Priority: `$FREE_VISION_CACHE_DIR` → `$XDG_CACHE_HOME/free-vision` → `~/.cache/free-vision`
+  - Old `.vision-cache/` in CWD is no longer created
+  - `free-vision cache stats` now prints the active cache directory
+- **`~/.free-vision/.env` global credential loading** (`src/cli.ts`)
+  - `~/.free-vision/.env` takes priority over CWD `.env` (backward-compatible order)
+  - CLI works from any directory without copying `.env`
+  - `.env.example` updated to reflect `FREE_VISION_CACHE_DIR`
+- **SKILL.md trigger covers tool-produced screenshots**
+  - Added "Tool-Produced Screenshots Count" table (Playwright MCP, agent-browser, chrome-devtools, CLI)
+  - Added reverse guardrail: prefer `browser_snapshot` for text/DOM questions, reserve free-vision for genuinely visual ones
+- **`src/util.ts` — removed dead code cacheGet/cacheSet** (unused; real impl lives in `src/cache.ts`)
+
+### Fixed
+
+- SKILL.md dual-copy drift — `~/.claude/skills/free-vision/SKILL.md` is now a symlink to the repo file
+- `.gitignore` — removed `.vision-cache/` entry (no longer needed; global cache is outside the repo)
+
 ## [0.4.0] - 2026-08-01
 
 ### Added

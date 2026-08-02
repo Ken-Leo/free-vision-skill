@@ -1,6 +1,6 @@
 {
   "name": "free-vision-skill",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "A low-token visual evidence compiler for text-only coding agents.",
   "type": "module",
   "license": "MIT",
@@ -50,6 +50,7 @@
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
     "check": "npm run typecheck && npm test",
+    "test:e2e": "node tests/e2e-vep.test.js",
     "prepublishOnly": "npm run check && npm run build"
   },
   "dependencies": {

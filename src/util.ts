@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { readFile } from "node:fs/promises";
 import path from "node:path";
 
 export function sha256(value: string | Buffer): string {
@@ -22,20 +22,6 @@ export async function readImageAsDataUrl(filePath: string): Promise<string> {
     ext === ".avif" ? "image/avif" :
     "image/jpeg";
   return `data:${mime};base64,${data.toString("base64")}`;
-}
-
-export async function cacheGet(key: string): Promise<string | null> {
-  try {
-    return await readFile(path.resolve(".vision-cache", `${key}.json`), "utf8");
-  } catch {
-    return null;
-  }
-}
-
-export async function cacheSet(key: string, value: string): Promise<void> {
-  const dir = path.resolve(".vision-cache");
-  await mkdir(dir, { recursive: true });
-  await writeFile(path.join(dir, `${key}.json`), value, "utf8");
 }
 
 export function extractJson(text: string): Record<string, unknown> {

@@ -3,9 +3,10 @@ dist/
 .env
 .env.*
 !.env.example
-.vision-cache/
 *.log
 .DS_Store
 coverage/
 *.tgz
 tmp/
+.vision-cache/
+

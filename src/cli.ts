@@ -1,7 +1,36 @@
 #!/usr/bin/env node
-import "dotenv/config";
+/**
+ * dotenv is loaded manually here instead of `import "dotenv/config"` so that
+ * credential lookup covers three locations (first match wins):
+ *
+ *   1. CWD .env            — the traditional project-local config
+ *   2. ~/.free-vision/.env — per-user config, cwd-independent (recommended)
+ *   3. System env vars     — already set by the shell / keychain / CI
+ *
+ * Order matters: local overrides global, preserving backwards compatibility.
+ */
+import { config } from "dotenv";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
+import os from "node:os";
+
+const HOME = os.homedir();
+
+// ① CWD .env  (backward-compat — lowest priority)
+config({ path: path.resolve(process.cwd(), ".env"), override: false });
+
+// ② ~/.free-vision/.env  (recommended — higher priority, cwd-independent)
+const globalEnv = path.join(HOME, ".free-vision", ".env");
+try {
+  const globalRaw = await readFile(globalEnv, "utf8");
+  for (const line of globalRaw.split("\n")) {
+    const m = line.match(/^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)/);
+    if (m) (process.env as Record<string, string | undefined>)[m[1]!] = m[2]!.replace(/^["']|["']$/g, "");
+  }
+} catch {
+  // ~/.free-vision/.env not found — silent, env may still be set by other means
+}
+
 import type { CliArgs, Region } from "./types.js";
 import {
   allProviders,
@@ -18,7 +47,7 @@ import {
   readImageAsDataUrl,
   sha256
 } from "./util.js";
-import { cacheGet, cacheSet, cacheCleanup, cacheGetStats } from "./cache.js";
+import { cacheGet, cacheSet, cacheCleanup, cacheGetStats, cacheGetDir } from "./cache.js";
 import {
   deleteProviderKey,
   readSecret,
@@ -313,6 +342,7 @@ async function cacheStats(): Promise<void> {
   const total = stats.hits + stats.misses;
 
   console.log("Cache Statistics:\n");
+  console.log(`  Location:     ${cacheGetDir()}`);
   console.log(`  Hit Rate:     ${(stats.hitRate * 100).toFixed(1)}% (${stats.hits}/${total})`);
   console.log(`  Misses:       ${stats.misses}`);
   console.log(`  Evictions:    ${stats.evictions}`);
