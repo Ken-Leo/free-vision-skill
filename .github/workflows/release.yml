@@ -5,26 +5,55 @@ on:
     tags:
       - 'v*'
 
+permissions:
+  contents: write   # for softprops/action-gh-release
+
 jobs:
   release:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
           registry-url: 'https://registry.npmjs.org'
-      
+
       - run: npm ci
       - run: npm run check
       - run: npm run build
-      
-      - run: npm publish
+
+      # Validate npm auth before publishing
+      - name: Verify npm identity
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-      
+        run: |
+          echo "Token prefix: ${NODE_AUTH_TOKEN:0:8}..."
+          npm whoami --registry=https://registry.npmjs.org || exit 1
+
+      # Check if version already published (avoids 403 on re-tag)
+      - name: Check if version exists on npm
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "Publishing version: $VERSION"
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "Authorization: Bearer $NODE_AUTH_TOKEN" \
+            "https://registry.npmjs.org/free-vision-skill/$VERSION")
+          echo "npm registry response for v$VERSION: $STATUS"
+          if [ "$STATUS" = "200" ]; then
+            echo "::warning::v$VERSION already published — skipping npm publish"
+            echo "ALREADY_PUBLISHED=true" >> "$GITHUB_ENV"
+          fi
+
+      - name: Publish to npm
+        if: env.ALREADY_PUBLISHED != 'true'
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --access public --provenance
+
       - uses: softprops/action-gh-release@v1
         with:
           generate_release_notes: true
