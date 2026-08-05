@@ -201,6 +201,42 @@ You: [cannot see pixels — do NOT narrate the page from the DOM and call it "ve
 You: [Reason based on VEP evidence + the DOM snapshot you already have]
 ```
 
+## Data Flow
+
+This skill runs as a **local CLI** — there is no image hosting service involved.
+
+```
+User's local file
+    ↓ (local encode)
+Base64 data URL  OR  image URL
+    ↓ (HTTP POST)
+Vision Provider API
+    ↓
+Visual Evidence Packet (VEP)
+    ↓ (filter)
+Agent reasoning
+```
+
+### Input modes
+
+| Mode | How it works | When used |
+|---|---|---|
+| **Base64** (default) | File bytes are read locally, base64-encoded, embedded in the request body as a `data:` URL | Default for all CLI usage — no network dependency beyond the API call |
+| **Image URL** | Provider receives a public URL to fetch the image itself | Only when the user explicitly passes `--image-url <url>`; some providers (e.g. OpenRouter) accept URLs directly |
+
+Base64 is the default because the skill is a **local CLI tool** — introducing an image host (图床) would add a network dependency and a third-party service for no benefit. The URL mode exists only for compatibility with providers that support it natively, or when the image already lives at a reachable URL.
+
+> **Request body size**: Base64 inflates the payload by ~33%. For images >2 MB the CLI auto-compresses to JPEG quality 80 before encoding. If you routinely process large screenshots, consider resizing them first, or switch to a provider that accepts URLs directly.
+
+## Architecture
+
+- **The vision provider is a sensor, not the brain.** It extracts facts; the main model reasons.
+- **One focused question per call.** Broad questions waste tokens and pollute context.
+- **Cache aggressively.** Identical image + question + provider returns a cached VEP for 24 hours.
+- **Fallback automatically.** If the primary provider fails, the next provider in the priority list is tried without manual intervention.
+
+See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the full system design.
+
 ## Command
 
 ```bash
@@ -315,3 +351,54 @@ After receiving VEP:
 3. Perform the reasoning yourself.
 4. State uncertainty if confidence is low.
 5. Run tests or validation before claiming success.
+
+## Skill Updates
+
+Free Vision Skill is versioned independently of the agent. Check for updates
+at the start of a session or when the user mentions vision analysis issues.
+
+### Auto-update check
+
+Run this command to compare your installed version against npm's latest:
+
+```bash
+npm view free-vision-skill version 2>/dev/null || \
+  curl -s https://registry.npmjs.org/free-vision-skill/latest | grep '"version"'
+```
+
+If the remote version is higher than your local `package.json` version,
+**inform the user and offer to update before proceeding**:
+
+```
+📦 Free Vision Skill update available: v0.4.1 → v0.4.2
+Run `npm install -g free-vision-skill@latest` to update.
+```
+
+Do not auto-update silently — always tell the user what changed.
+
+### Self-update via skill sync
+
+If the user uses `npx skills add lora-sys/free-vision-skill`, the skill
+management CLI handles updates automatically:
+
+```bash
+npx skills update free-vision-skill
+```
+
+For manual installs (clone + `npm install`):
+
+```bash
+cd <skill-dir> && git pull && npm install
+```
+
+### After updating
+
+Report the changes to the user by reading the new `CHANGELOG.md`:
+
+```
+Updated to v0.4.2. Changes:
+- [Added] New vision provider: ...
+- [Fixed] Crash when processing ...
+```
+
+This helps the user decide whether the update affects their workflow.
