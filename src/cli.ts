@@ -46,7 +46,8 @@ import { parseVisionResult, toVep } from "./vep.js";
 import {
   normalizeQuestion,
   readImageAsDataUrl,
-  sha256
+  sha256,
+  toDataUrl
 } from "./util.js";
 import { cacheGet, cacheSet, cacheCleanup, cacheGetStats, cacheGetDir } from "./cache.js";
 import {
@@ -171,12 +172,16 @@ async function see(args: CliArgs): Promise<void> {
 
     // Auto-compress large images (>2 MB) to JPEG quality 80
     const MAX_RAW_BYTES = 2 * 1024 * 1024;
+    let compressed = false;
     if (imageBytes.length > MAX_RAW_BYTES && actualImagePath) {
       try {
-        const compressed = await sharp(actualImagePath)
+        const smaller = await sharp(actualImagePath)
           .jpeg({ quality: 80, progressive: true })
           .toBuffer();
-        imageBytes = compressed;
+        if (smaller.length < imageBytes.length) {
+          imageBytes = smaller;
+          compressed = true;
+        }
         console.error(`\n📦 Compressed ${(imageBytes.length / 1024).toFixed(0)} KB (JPEG 80%)`);
       } catch (compressError) {
         console.error(
@@ -185,7 +190,13 @@ async function see(args: CliArgs): Promise<void> {
       }
     }
 
-    imageDataUrl = await readImageAsDataUrl(actualImagePath!);
+    // Build data URL from the (possibly compressed) bytes we already have in memory.
+    // This avoids re-reading the file after compression, which was a bug — the
+    // data URL was always built from the original uncompressed file.
+    imageDataUrl = toDataUrl(
+      imageBytes,
+      compressed ? "image/jpeg" : undefined  // undefined → infer from file extension
+    );
   }
   const providers = resolveProviderOrder(requested, region);
   const errors: string[] = [];

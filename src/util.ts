@@ -10,6 +10,11 @@ export function normalizeQuestion(value: string): string {
   return value.replace(/\s+/g, " ").trim().toLowerCase();
 }
 
+export function toDataUrl(bytes: Buffer, mime?: string): string {
+  const detected = mime ?? "image/png";
+  return `data:${detected};base64,${bytes.toString("base64")}`;
+}
+
 export async function readImageAsDataUrl(filePath: string): Promise<string> {
   const absolute = path.resolve(filePath);
   const data = await readFile(absolute);
