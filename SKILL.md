@@ -1,9 +1,9 @@
 ---
 name: free-vision
 description: Give text-only coding agents low-token image understanding through compact Visual Evidence Packets.
-version: "0.1.0"
+version: "0.4.1"
 metadata:
-  version: "0.1.0"
+  version: "0.4.1"
   output_protocol: "VEP/1"
   author: "lora-sys"
   license: "MIT"
