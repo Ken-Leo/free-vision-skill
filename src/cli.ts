@@ -11,6 +11,7 @@
  */
 import { config } from "dotenv";
 import { readFile } from "node:fs/promises";
+import sharp from "sharp";
 import path from "node:path";
 import os from "node:os";
 
@@ -84,6 +85,7 @@ Free Vision Skill
 
 Usage:
   free-vision see --image ./screen.png --question "截图里是什么错误？"
+  free-vision see --image-url https://example.com/photo.jpg --question "Describe this"
   free-vision providers
   free-vision doctor
   free-vision cache [clear|stats]
@@ -96,6 +98,7 @@ Options:
   --json          Print compact JSON instead of VEP
   --no-cache      Ignore local cache
   --auto-crop     Auto-crop white margins from image
+  --image-url <u> Pass a public image URL instead of a local file
   --max-chars 520 Maximum VEP characters
 `);
   process.exit(1);
@@ -103,12 +106,13 @@ Options:
 
 async function see(args: CliArgs): Promise<void> {
   const imagePath = typeof args.image === "string" ? args.image : "";
+  const imageUrl = typeof args["image-url"] === "string" ? args["image-url"] : "";
   const question =
     typeof args.question === "string"
       ? args.question
       : "Return only the most important visible evidence.";
 
-  if (!imagePath) usage();
+  if (!imagePath && !imageUrl) usage();
 
   const requested =
     typeof args.provider === "string"
@@ -131,31 +135,58 @@ async function see(args: CliArgs): Promise<void> {
   const mode = inferMode(question);
   const prompt = buildPrompt(question, mode);
 
-  const absolute = path.resolve(imagePath);
   let imageBytes: Buffer;
   let imageDataUrl: string;
-  let actualImagePath = absolute;
+  let actualImagePath: string | undefined;
+  let useImageUrl = false;
 
-  // Auto-crop if requested
-  if (args["auto-crop"]) {
-    try {
-      const cropResult = await autoCrop(absolute);
-      if (cropResult.cropped) {
-        console.error(`\n${formatCropResult(cropResult)}`);
-        actualImagePath = cropResult.savedPath!;
-      } else {
-        console.error(`\n✂️  Crop skipped: ${cropResult.reason}`);
+  // ── URL mode ──────────────────────────────────────────────────────────────
+  if (imageUrl) {
+    imageDataUrl = imageUrl;   // pass the URL through as-is
+    imageBytes = Buffer.from(imageUrl); // use URL as cache key component
+    useImageUrl = true;
+  } else {
+    // ── Base64 mode (local file) ─────────────────────────────────────────────
+    const absolute = path.resolve(imagePath);
+    actualImagePath = absolute;
+
+    // Auto-crop if requested
+    if (args["auto-crop"]) {
+      try {
+        const cropResult = await autoCrop(absolute);
+        if (cropResult.cropped) {
+          console.error(`\n${formatCropResult(cropResult)}`);
+          actualImagePath = cropResult.savedPath!;
+        } else {
+          console.error(`\n✂️  Crop skipped: ${cropResult.reason}`);
+        }
+      } catch (cropError) {
+        console.error(
+          `\n⚠️  Auto-crop failed: ${cropError instanceof Error ? cropError.message : String(cropError)}`
+        );
       }
-    } catch (cropError) {
-      console.error(
-        `\n⚠️  Auto-crop failed: ${cropError instanceof Error ? cropError.message : String(cropError)}`
-      );
-      // Continue with original image
     }
-  }
 
-  imageBytes = await readFile(actualImagePath);
-  imageDataUrl = await readImageAsDataUrl(actualImagePath);
+    imageBytes = await readFile(actualImagePath!);
+
+    // Auto-compress large images (>2 MB) to JPEG quality 80
+    const MAX_RAW_BYTES = 2 * 1024 * 1024;
+    if (imageBytes.length > MAX_RAW_BYTES && actualImagePath) {
+      try {
+        const compressed = await sharp(actualImagePath)
+          .jpeg({ quality: 80, progressive: true })
+          .toBuffer();
+        imageBytes = compressed;
+        console.error(`\n📦 Compressed ${(imageBytes.length / 1024).toFixed(0)} KB (JPEG 80%)`);
+      } catch (compressError) {
+        console.error(
+          `\n⚠️  Compression failed: ${compressError instanceof Error ? compressError.message : String(compressError)} — using original`
+        );
+      }
+    }
+
+    imageDataUrl = await readImageAsDataUrl(actualImagePath!);
+  }
   const providers = resolveProviderOrder(requested, region);
   const errors: string[] = [];
 
