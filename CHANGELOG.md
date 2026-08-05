@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/2.0.0.
 
 ### Added
 
+- **`--image-url` mode** — pass a public image URL directly to the provider
+  without base64-encoding. The provider fetches the image itself.
+  Useful when the image already lives at a reachable URL.
+- **Auto-compress large images** — files >2 MB are automatically re-encoded
+  to JPEG quality 80 before base64 encoding, cutting payload by 60–80%.
+  The compressed bytes are used for the data URL (no re-read from disk).
 - **Claude Code PostToolUse Hook** — automatic VEP injection on image Read
   - `hooks/claude-code/post-read-image.sh` — fires after any `Read` of a `.png/.jpg/.webp/.gif/.bmp/.avif` file
   - Runs `free-vision see` silently, injects VEP into `hookSpecificOutput.additionalContext`
@@ -38,8 +44,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/2.0.0.
 
 ### Fixed
 
+- Auto-compress now uses the compressed bytes for the data URL instead of
+  re-reading the original file from disk, which previously caused the
+  compression to have no effect on the API request body.
 - SKILL.md dual-copy drift — `~/.claude/skills/free-vision/SKILL.md` is now a symlink to the repo file
-- `.gitignore` — removed `.vision-cache/` entry (no longer needed; global cache is outside the repo)
+- `.gitignore` — removed stale `.vision-cache/` entry (global cache lives outside the repo)
 
 ## [0.4.0] - 2026-08-01
 
