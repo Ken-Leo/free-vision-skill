@@ -3,6 +3,22 @@
   "verifiedAt": "2026-08-01",
   "providers": [
     {
+      "id": "custom",
+      "name": "Custom OpenAI-compatible endpoint (local oMLX)",
+      "region": "cn",
+      "kind": "openai",
+      "baseUrl": "http://127.0.0.1:8000/v1",
+      "baseUrlEnv": "VISION_BASE_URL",
+      "apiKeyEnv": "VISION_API_KEY",
+      "models": [],
+      "defaultModel": "",
+      "modelEnv": "VISION_MODEL",
+      "free": "self-hosted / bring-your-own endpoint",
+      "supportsDetail": false,
+      "priority": 5,
+      "notes": "Local oMLX Qwen or any OpenAI-compatible endpoint. Set VISION_BASE_URL, VISION_MODEL, VISION_API_KEY."
+    },
+    {
       "id": "zhipu",
       "name": "Zhipu BigModel",
       "region": "cn",
