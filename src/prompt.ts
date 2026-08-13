@@ -46,7 +46,13 @@ export function buildPrompt(question: string, mode: VisionMode): string {
         : mode === "chart"
           ? "Prioritize title, axes, legend, trend and only the most important values."
           : mode === "ui"
-            ? "Prioritize labels, disabled controls, clipping, overlap, hierarchy and visible state."
+            ? "Task: precise UI design reconstruction. Enumerate EVERY visible element with spatial detail; do not omit or summarize. "
+              + "For each element output one JSON object with: type (container/card/heading/label/button/input/toggle/select/icon/image/nav/modal/table/list/divider...), "
+              + "exact text or label, bounding box as [x,y,w,h] in image pixels (or relative % when pixels are ambiguous), "
+              + "parent container id, horizontal/vertical alignment, relative spacing/padding, colors as hex (fill, border, text, accent), "
+              + "font (size in px, weight, family), corner radius, and visible state (normal/hover/disabled/selected/focus/error). "
+              + "Preserve visual order and hierarchy (top-down; containers before their children). "
+              + "Output the full element inventory as the 'o' array; empty fields omitted."
             : "Answer the exact visual question with only the evidence required.";
 
   return `${rules} ${schema} ${modeRule} Question: ${question}`;

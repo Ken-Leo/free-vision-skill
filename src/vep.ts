@@ -1,6 +1,23 @@
 import { compactList, compactText, extractJson } from "./util.js";
 import type { VisionMode, VisionResult } from "./types.js";
 
+
+function toElements(
+  value: unknown,
+  count: number,
+  each: number
+): string[] {
+  if (!Array.isArray(value)) return [];
+  return value
+    .map(item => (item && typeof item === "object"
+      ? JSON.stringify(item)
+      : typeof item === "string" ? item : ""))
+    .filter(Boolean)
+    .slice(0, count)
+    .map(item => compactText(item, each))
+    .filter(Boolean);
+}
+
 export function parseVisionResult(
   raw: string,
   provider: string,
@@ -9,6 +26,9 @@ export function parseVisionResult(
   cached: boolean
 ): VisionResult {
   const value = extractJson(raw);
+  const caps = mode === "ui"
+    ? { answer: 500, text: 800, summary: 260, oCount: 32, oEach: 260, eCount: 10, eEach: 180, vCount: 14, vEach: 90 }
+    : { answer: 240, text: 320, summary: 180, oCount: 6, oEach: 55, eCount: 4, eEach: 80, vCount: 6, vEach: 50 };
   const confidence =
     typeof value.c === "number"
       ? Math.max(0, Math.min(1, value.c))
@@ -18,12 +38,12 @@ export function parseVisionResult(
     provider,
     model,
     mode,
-    answer: compactText(value.a ?? value.answer, 240) || undefined,
-    text: compactText(value.t ?? value.text, 320) || undefined,
-    summary: compactText(value.s ?? value.summary, 180) || undefined,
-    objects: compactList(value.o ?? value.objects, 6, 55),
-    issues: compactList(value.e ?? value.issues, 4, 80),
-    values: compactList(value.v ?? value.values, 6, 50),
+    answer: compactText(value.a ?? value.answer, caps.answer) || undefined,
+    text: compactText(value.t ?? value.text, caps.text) || undefined,
+    summary: compactText(value.s ?? value.summary, caps.summary) || undefined,
+    objects: toElements(value.o ?? value.objects, caps.oCount, caps.oEach),
+    issues: compactList(value.e ?? value.issues, caps.eCount, caps.eEach),
+    values: compactList(value.v ?? value.values, caps.vCount, caps.vEach),
     confidence,
     raw,
     cached

@@ -402,3 +402,28 @@ Updated to v0.4.2. Changes:
 ```
 
 This helps the user decide whether the update affects their workflow.
+
+---
+
+## 🎨 UI 设计 / 界面还原（推荐使用 --json）
+
+当任务是把图片里的界面**还原成可实现的 UI 布局与功能**（而不是只找 bug/QA）时，请用这种方式获得足够精确的信息：
+
+```bash
+free-vision see --image ui.png --question "还原这个界面的UI布局，列出各组件类型、坐标bbox、颜色、层级结构，逐个列出不遗漏" --json
+```
+
+要点：
+- **必须用 `--json` 而不是只看紧凑 VEP**：紧凑 VEP 是有损压缩（默认字段很短），只适合快速 OCR/报错；UI 还原要看返回的 `objects` 数组或 `raw` 字段，那里才有完整元素清单。
+- 元素结构（在 `objects` / `raw` 里，UI 模式已放宽数量与长度上限）：`{"type":"button","label":"OK","bbox":[x,y,w,h],"color":"#ffffff","font":"sans-serif-bold","level":1}`，`bbox` 是相对图片像素的坐标。
+- **mode 触发**：想让模型走增强后的 UI 提示，问题里带"界面/按钮/组件/页面/UI/布局/design"等词；尽量少用"提取/文字"这类会被优先判成 OCR 的词（OCR 模式不加载 UI 结构提示，元素结构会不完整）。
+- 让视觉模型只负责"看"和"列元素"（类型/文字/坐标/配色/字体/层级），布局实现、组件代码、交互逻辑由主模型（你自己）完成。
+
+---
+
+## 配置参考
+
+全局配置位于 `~/.free-vision/.env`（cwd 无关，所有项目生效）：
+- `VISION_PROVIDER=custom`、`VISION_BASE_URL=<本地 oMLX 地址>/v1`、`VISION_MODEL=<模型名>`、`VISION_API_KEY=<占位>`。
+- `VISION_MAX_OUTPUT_TOKENS`：UI 还原建议 ≥ 2048（已设为 4096）。
+- `VISION_TIMEOUT_MS`：本地中型 MoE 生成密集 UI 可能较慢，设大些（已设 300000）。
