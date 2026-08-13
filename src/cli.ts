@@ -42,6 +42,7 @@ import {
 } from "./providers.js";
 import { buildPrompt, inferMode } from "./prompt.js";
 import { callVision } from "./call.js";
+import { runDescribe } from "./describe.js";
 import { parseVisionResult, toVep } from "./vep.js";
 import {
   normalizeQuestion,
@@ -87,6 +88,7 @@ Free Vision Skill
 Usage:
   free-vision see --image ./screen.png --question "截图里是什么错误？"
   free-vision see --image-url https://example.com/photo.jpg --question "Describe this"
+  free-vision describe --image ./screenshot.png [--prompt "自定义要求"] [--max-tokens 4096] [--json]
   free-vision providers
   free-vision doctor
   free-vision cache [clear|stats]
@@ -419,6 +421,7 @@ async function main(): Promise<void> {
   const args = parseArgs([positional, ...rest].filter(Boolean) as string[]);
 
   if (command === "see") await see(args);
+  else if (command === "describe") await runDescribe(args);
   else if (command === "providers") await providers();
   else if (command === "doctor") await doctor();
   else if (command === "cache") await handleCache(positional);

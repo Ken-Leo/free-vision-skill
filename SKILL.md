@@ -427,3 +427,26 @@ free-vision see --image ui.png --question "还原这个界面的UI布局，列�
 - `VISION_PROVIDER=custom`、`VISION_BASE_URL=<本地 oMLX 地址>/v1`、`VISION_MODEL=<模型名>`、`VISION_API_KEY=<占位>`。
 - `VISION_MAX_OUTPUT_TOKENS`：UI 还原建议 ≥ 2048（已设为 4096）。
 - `VISION_TIMEOUT_MS`：本地中型 MoE 生成密集 UI 可能较慢，设大些（已设 300000）。
+
+---
+
+## 🗺 完整通读：`free-vision describe`（推荐用于完整识别 / 还原界面）
+
+需要"完整识别一张图 / 把整个 UI 还原出来"时，用 `describe` 而不是 `see`：
+
+```bash
+free-vision describe --image <图片路径> [--max-tokens 4096] [--json] [--prompt "自定义要求"]
+```
+
+要点：
+
+- **不走 VEP 压缩**：直接返回视觉模型对整张图的完整逐区域描述原文（默认中文、详尽、不省略）。
+- 默认按软件/GUI 界面通读：标题栏 / 菜单 / 工具栏 / 左右面板 / 主内容区 / 状态栏 / 布局配色；非界面图也会完整描述。
+- `--prompt` 可换成你自己的要求；`--json` 拿到 `{"provider","model","text"}`。
+
+什么时候用哪个：
+
+| 场景 | 用 | 原因 |
+|---|---|---|
+| 完整识别 / 还原 UI 布局、写实现、核对界面全貌 | `describe` | 信息优先、不丢细节；本地模型较慢（约 1–3 分钟） |
+| 快速定向取证（报错 / 单个 OCR / 某个控件状态） | `see` | 又快又省 token，但要先想好一个聚焦问题 |
