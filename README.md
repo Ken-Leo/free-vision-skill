@@ -5,19 +5,19 @@
 
 <div align="center">
 
-[![MIT License](https://img.shields.io/badge/license-MIT-0ea5e9?style=flat-square)](./LICENSE)
-[![Node 20+](https://img.shields.io/badge/node-%3E%3D20-22c55e?style=flat-square)](https://nodejs.org/)
-[![VEP/1 Protocol](https://img.shields.io/badge/output-VEP%2F1-38bdf8?style=flat-square)](./docs/VEP.md)
-[![Text-Only Agents](https://img.shields.io/badge/for-text--only_agents-white?style=flat-square)](./docs/AGENT_INTEGRATION.md)
-[![v0.4.1](https://img.shields.io/badge/version-0.4.1-blue?style=flat-square)](./CHANGELOG.md)
-[![CI/CD](https://img.shields.io/badge/CI%2FCD-passing-brightgreen?style=flat-square)](https://github.com/lora-sys/free-vision-skill/actions/workflows/ci.yml)
-[![30/30 Tests](https://img.shields.io/badge/tests-30%2F30%20passing-success?style=flat-square)](./tests)
+[![MIT License](https://img.shields.io/badge/license-MIT-8B5E34?style=flat-square)](./LICENSE)
+[![Node 20+](https://img.shields.io/badge/node-%3E%3D20-1A1A1A?style=flat-square)](https://nodejs.org/)
+[![VEP/1 Protocol](https://img.shields.io/badge/output-VEP%2F1-4F7A64?style=flat-square)](./docs/VEP.md)
+[![Text-Only Agents](https://img.shields.io/badge/for-text--only_agents-EDE6D6?style=flat-square&labelColor=1A1A1A)](./docs/INTEGRATION_CLAUDE_CODE.md)
+[![v0.4.1](https://img.shields.io/badge/version-0.4.1-8B5E34?style=flat-square)](./CHANGELOG.md)
+[![CI/CD](https://img.shields.io/badge/CI%2FCD-passing-4F7A64?style=flat-square)](https://github.com/lora-sys/free-vision-skill/actions/workflows/ci.yml)
+[![30/30 Tests](https://img.shields.io/badge/tests-30%2F30%20passing-E0A62F?style=flat-square)](./tests)
 
 </div>
 
 ---
 
-<img src="./assets/readme/hero.svg" alt="Free Vision Skill: 将图片压缩为 VEP 证据包（50-150 tokens），让文本模型也能看见" width="100%"/>
+<img src="./assets/readme/hero-v1.webp" alt="Lora 检查图片并将可见信息压缩为 50–150 tokens 的 VEP/1 证据包，再交给文本模型推理" width="100%"/>
 
 ---
 
@@ -134,7 +134,7 @@ free-vision see --image ./invoice.png --json --question "提取发票金额和�
 | 🚨 **强制触发检测** | 模型无法读图时自动触发，不再误诊为"图片损坏" |
 | ✂️ **智能裁剪** | 自动检测边距，减少 50-90% 图片大小 |
 
-**详细文档：** [核心特性详解](./docs/FEATURES.md)
+**详细文档：** [架构与核心机制](./docs/ARCHITECTURE.md)
 
 ---
 
@@ -173,7 +173,7 @@ free-vision see --image ./invoice.png --json --question "提取发票金额和�
 | 构建 | ✅ 成功 |
 | CI/CD | ✅ [GitHub Actions](https://github.com/lora-sys/free-vision-skill/actions) 绿色通过 |
 
-**详细测试报告：** [测试状态](./docs/TEST_STATUS.md)
+**详细测试报告：** [测试目录](./tests)
 
 ---
 
@@ -189,16 +189,16 @@ free-vision see --image ./invoice.png --json --question "提取发票金额和�
 - **[架构设计](./docs/ARCHITECTURE.md)** — 系统设计
 - **[使用场景](./docs/USE_CASES.md)** — 常见场景示例
 - **[Token 经济学](./docs/TOKEN_ECONOMICS.md)** — Token 对比分析
-- **[为什么需要它](./docs/WHY_VISION.md)** — 解决的问题
+- **[为什么需要它](#-为什么需要它)** — 解决的问题
 
 ### 🛠️ 集成
-- **[Agent 集成](./docs/AGENT_INTEGRATION.md)** — Claude Code / Codex / OpenCode
+- **[Agent 集成](./docs/INTEGRATION_CLAUDE_CODE.md)** — Claude Code / Codex / OpenCode
 - **[Provider 配置](./docs/PROVIDERS.md)** — 13 个 Provider 对比
 - **[Claude Code Hook](./docs/INTEGRATION_CLAUDE_CODE.md)** — Hook 配置
 
 ### 🔒 安全与性能
 - **[安全策略](./docs/SECURITY.md)** — 威胁模型和防护
-- **[性能优化](./docs/PERFORMANCE.md)** — 缓存 + 并发 + 降级
+- **[Token 与性能](./docs/TOKEN_ECONOMICS.md)** — 缓存 + 并发 + 降级
 - **[FAQ](./docs/FAQ.md)** — 常见问题
 
 ### 📋 开发

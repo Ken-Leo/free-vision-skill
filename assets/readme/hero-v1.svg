@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="380" viewBox="0 0 1200 380" role="img" aria-labelledby="title desc">
+  <title id="title">Free Vision Skill, 50 to 150 token visual evidence packets</title>
+  <desc id="desc">Image evidence is cropped, extracted into VEP/1, and handed to a text model without outsourcing reasoning.</desc>
+  <defs>
+    <pattern id="paper" width="18" height="18" patternUnits="userSpaceOnUse"><circle cx="2" cy="3" r="0.7" fill="#8B5E34" opacity="0.08"/></pattern>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#4F7A64"/></marker>
+  </defs>
+  <rect width="1200" height="380" rx="28" fill="#F7F4EE"/><rect width="1200" height="380" rx="28" fill="url(#paper)"/><path d="M0 8H1200" stroke="#E0A62F" stroke-width="8"/>
+  <g id="title-block" transform="translate(58 54)">
+    <text fill="#8B5E34" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="15" font-weight="750" letter-spacing="2.4">VISUAL EVIDENCE COMPILER / VEP·1</text>
+    <text y="79" fill="#1A1A1A" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="60" font-weight="850" letter-spacing="-2">Free Vision Skill</text>
+    <text y="129" fill="#4F7A64" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif" font-size="25" font-weight="760">50–150 tokens 的视觉证据包</text>
+    <path d="M0 161H468" stroke="#1A1A1A" stroke-width="1.5" opacity="0.16"/>
+    <text y="196" fill="#4A4A4A" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif" font-size="18">视觉模型负责看见，文本模型继续负责思考。</text>
+    <g transform="translate(0 236)" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="15" font-weight="760">
+      <rect width="82" height="38" rx="19" fill="#1A1A1A"/><text x="19" y="25" fill="#F7F4EE">IMAGE</text>
+      <text x="94" y="25" fill="#8B5E34">→</text>
+      <rect x="116" width="98" height="38" rx="19" fill="#EDE6D6"/><text x="134" y="25" fill="#1A1A1A">EXTRACT</text>
+      <text x="226" y="25" fill="#8B5E34">→</text>
+      <rect x="248" width="82" height="38" rx="19" fill="#4F7A64"/><text x="264" y="25" fill="#F7F4EE">VEP/1</text>
+      <text x="342" y="25" fill="#8B5E34">→</text>
+      <rect x="364" width="112" height="38" rx="19" fill="#EDE6D6"/><text x="382" y="25" fill="#1A1A1A">TEXT MODEL</text>
+    </g>
+  </g>
+  <g id="evidence-proof" transform="translate(590 54)">
+    <rect width="552" height="272" rx="24" fill="#EDE6D6" stroke="#8B5E34" stroke-opacity="0.24"/>
+    <g transform="translate(28 34)">
+      <rect width="126" height="174" rx="14" fill="#F7F4EE" stroke="#1A1A1A" stroke-opacity="0.22"/>
+      <path d="M18 26h36M18 42h78" stroke="#8B5E34" stroke-width="4" stroke-linecap="round" opacity="0.45"/>
+      <rect x="18" y="64" width="90" height="72" rx="9" fill="#D8CFC0"/>
+      <path d="M28 124l21-24 16 16 16-20 18 28" fill="none" stroke="#1A1A1A" stroke-width="3" opacity="0.55"/>
+      <path d="M12 56h14M12 56v14M114 56h-14M114 56v14M12 144h14M12 144v-14M114 144h-14M114 144v-14" fill="none" stroke="#E0A62F" stroke-width="3"/>
+      <text x="63" y="162" text-anchor="middle" fill="#8B5E34" font-family="ui-monospace, monospace" font-size="12" font-weight="700">VISIBLE INPUT</text>
+    </g>
+    <path d="M174 122H221" stroke="#4F7A64" stroke-width="3" marker-end="url(#arrow)"/>
+    <g transform="translate(238 26)">
+      <rect width="170" height="222" rx="16" fill="#F7F4EE" stroke="#4F7A64" stroke-width="2"/>
+      <rect x="18" y="18" width="70" height="25" rx="12" fill="#4F7A64"/><text x="53" y="35" text-anchor="middle" fill="#F7F4EE" font-family="ui-monospace, monospace" font-size="12" font-weight="800">VEP/1</text>
+      <g fill="#1A1A1A" font-family="ui-monospace, monospace" font-size="13"><text x="18" y="72">src  provider</text><text x="18" y="100">m    focused</text><text x="18" y="128">a    evidence</text><text x="18" y="156">t    visible text</text><text x="18" y="184">c    0.96</text></g>
+      <path d="M18 198H150" stroke="#E0A62F" stroke-width="4" stroke-linecap="round"/>
+    </g>
+    <path d="M424 122H462" stroke="#4F7A64" stroke-width="3" marker-end="url(#arrow)"/>
+    <g transform="translate(482 82)">
+      <circle cx="22" cy="40" r="34" fill="#1A1A1A"/>
+      <path d="M10 40h24M22 28v24" stroke="#E0A62F" stroke-width="3" stroke-linecap="round"/>
+      <text x="22" y="94" text-anchor="middle" fill="#4A4A4A" font-family="ui-monospace, monospace" font-size="12" font-weight="700">REASON</text>
+    </g>
+  </g>
+</svg>
